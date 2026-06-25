@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from "react-router-dom";
+import { HashRouter as Router, Routes, Route, Link, useNavigate } from "react-router-dom";
 import { database, ref, set, onValue } from "./firebase";
 import MapComponent from "./MapComponent"; 
 import AuthPage from "./AuthPage";
