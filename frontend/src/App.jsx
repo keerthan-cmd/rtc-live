@@ -4,6 +4,8 @@ import { database, ref, set, onValue } from "./firebase";
 import MapComponent from "./MapComponent"; 
 import AuthPage from "./AuthPage";
 import OTPPage from "./OTPPage";
+import emailjs from '@emailjs/browser';
+import { get, child } from "firebase/database";
 
 export default function App() {
   return (
@@ -22,28 +24,107 @@ export default function App() {
 
 // This new component handles the switch between Login -> OTP -> Main App
 function AuthFlow() {
-  const [step, setStep] = useState("login"); // 'login' or 'otp'
-  const [authData, setAuthData] = useState({ email: "", role: "", mode: "" });
+  const [step, setStep] = useState("login"); 
+  const [authData, setAuthData] = useState({ email: "", role: "" });
+  const [isProcessing, setIsProcessing] = useState(false);
   const navigate = useNavigate();
 
-  const handleNavigateToOTP = (data) => {
-    setAuthData(data);
-    setStep("otp");
+  // 🔴 PUT YOUR EMAILJS KEYS HERE 🔴
+  const EMAILJS_SERVICE_ID = "service_057l2cf";
+  const EMAILJS_TEMPLATE_ID = "template_1wigsc6";
+  const EMAILJS_PUBLIC_KEY = "LIuoaP_pa9oJuofG9";
+
+  // Helper to format emails for Firebase (Firebase keys can't have periods)
+  const sanitizeEmail = (email) => email.replace(/\./g, ',');
+
+  const handleNavigateToOTP = async (data) => {
+    setIsProcessing(true);
+    const safeEmail = sanitizeEmail(data.email);
+    const dbRef = ref(database);
+
+    try {
+      // 1. VIP Check for Admins
+      if (data.role === "Admin") {
+        const adminCheck = await get(child(dbRef, `allowed_admins/${safeEmail}`));
+        if (!adminCheck.exists()) {
+          alert("Access Denied: This email is not registered as an Admin.");
+          setIsProcessing(false);
+          return;
+        }
+      }
+
+      // 2. Generate a random 6-digit OTP
+      const generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+
+      // 3. Save it temporarily in Firebase
+      await set(ref(database, `temporary_otps/${safeEmail}`), {
+        code: generatedOTP,
+        timestamp: Date.now()
+      });
+
+      // 4. Send the real email via EmailJS
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          to_email: data.email,
+          otp_code: generatedOTP,
+        },
+        EMAILJS_PUBLIC_KEY
+      );
+
+      // 5. Move to the OTP screen
+      setAuthData(data);
+      setStep("otp");
+      
+    } catch (error) {
+      console.error("Error sending OTP:", error);
+      alert("Failed to send email. Please try again.");
+    }
+    setIsProcessing(false);
   };
 
-  const handleVerifyOTP = (otpCode) => {
-    // In Phase 2, this is where we actually check Firebase to see if the OTP is right.
-    // For now, we simulate a successful login!
-    console.log(`Verified OTP ${otpCode} for ${authData.email} as ${authData.role}`);
+  const handleVerifyOTP = async (enteredCode) => {
+    const safeEmail = sanitizeEmail(authData.email);
     
-    // Route them to the correct app based on their role
-    if (authData.role === "User") navigate("/user");
-    if (authData.role === "Driver") navigate("/driver");
-    if (authData.role === "Admin") navigate("/admin");
+    try {
+      // 1. Check Firebase to see if the OTP matches
+      const otpSnapshot = await get(child(ref(database), `temporary_otps/${safeEmail}`));
+      
+      if (otpSnapshot.exists() && otpSnapshot.val().code === enteredCode) {
+        
+        // 2. Success! Delete the temporary OTP for security
+        await set(ref(database, `temporary_otps/${safeEmail}`), null);
+
+        // 3. Save the User/Driver to the database permanently
+        if (authData.role !== "Admin") {
+          await set(ref(database, `active_users/${authData.role}s/${safeEmail}`), {
+            email: authData.email,
+            lastLogin: Date.now(),
+            status: "Active"
+          });
+        }
+
+        // 4. Route them to their dashboard
+        if (authData.role === "User") navigate("/user");
+        if (authData.role === "Driver") navigate("/driver");
+        if (authData.role === "Admin") navigate("/admin");
+        
+      } else {
+        alert("Invalid OTP code. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error verifying OTP:", error);
+    }
   };
 
   if (step === "login") {
-    return <AuthPage onNavigateToOTP={handleNavigateToOTP} />;
+    return (
+      <div style={{ pointerEvents: isProcessing ? 'none' : 'auto', opacity: isProcessing ? 0.7 : 1 }}>
+        <AuthPage onNavigateToOTP={handleNavigateToOTP} />
+        {isProcessing && <p style={{textAlign: 'center', fontWeight: 'bold'}}>Sending secure code...</p>}
+      </div>
+    );
   }
 
   return (
@@ -55,6 +136,8 @@ function AuthFlow() {
     />
   );
 }
+
+// ... (Keep the rest of your App.jsx below this) ...
 
 // -------------------------------------------------------------
 // EVERYTHING BELOW HERE IS YOUR EXISTING WORKING CODE
