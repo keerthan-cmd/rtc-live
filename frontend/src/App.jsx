@@ -28,12 +28,10 @@ function AuthFlow() {
   const [isProcessing, setIsProcessing] = useState(false);
   const navigate = useNavigate();
 
-  // 🔴 YOUR EMAILJS KEYS 🔴
   const EMAILJS_SERVICE_ID = "service_057l2cf";
   const EMAILJS_TEMPLATE_ID = "template_1wigsc6";
   const EMAILJS_PUBLIC_KEY = "LIuoaP_pa9oJuofG9";
 
-  // AUTO-LOGIN: Check if they already have a saved session when the app opens
   useEffect(() => {
     const savedSession = localStorage.getItem("rtc_session");
     if (savedSession) {
@@ -52,6 +50,19 @@ function AuthFlow() {
     const dbRef = ref(database);
 
     try {
+      if (data.role === "User") {
+        localStorage.setItem("rtc_session", JSON.stringify({ role: "User", timestamp: Date.now() }));
+        navigate("/user");
+        return;
+      }
+
+      if (data.role === "Driver") {
+        setAuthData(data);
+        setStep("otp"); 
+        setIsProcessing(false);
+        return;
+      }
+
       if (data.role === "Admin") {
         const adminCheck = await get(child(dbRef, `allowed_admins/${safeEmail}`));
         if (!adminCheck.exists()) {
@@ -59,28 +70,28 @@ function AuthFlow() {
           setIsProcessing(false);
           return;
         }
+
+        const generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+
+        await set(ref(database, `temporary_otps/${safeEmail}`), {
+          code: generatedOTP,
+          timestamp: Date.now()
+        });
+
+        await emailjs.send(
+          EMAILJS_SERVICE_ID,
+          EMAILJS_TEMPLATE_ID,
+          { to_email: data.email, otp_code: generatedOTP },
+          EMAILJS_PUBLIC_KEY
+        );
+
+        setAuthData(data);
+        setStep("otp");
       }
-
-      const generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
-
-      await set(ref(database, `temporary_otps/${safeEmail}`), {
-        code: generatedOTP,
-        timestamp: Date.now()
-      });
-
-      await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
-        { to_email: data.email, otp_code: generatedOTP },
-        EMAILJS_PUBLIC_KEY
-      );
-
-      setAuthData(data);
-      setStep("otp");
       
     } catch (error) {
-      console.error("Error sending OTP:", error);
-      alert("Failed to send email. Please try again.");
+      console.error("Error routing login:", error);
+      alert("System error. Please try again.");
     }
     setIsProcessing(false);
   };
@@ -89,36 +100,31 @@ function AuthFlow() {
     const safeEmail = sanitizeEmail(authData.email);
     
     try {
-      const otpSnapshot = await get(child(ref(database), `temporary_otps/${safeEmail}`));
-      
-      if (otpSnapshot.exists() && otpSnapshot.val().code === enteredCode) {
+      if (authData.role === "Driver") {
+        const masterFleetPIN = "123456"; 
         
-        await set(ref(database, `temporary_otps/${safeEmail}`), null);
-
-        if (authData.role !== "Admin") {
-          await set(ref(database, `active_users/${authData.role}s/${safeEmail}`), {
-            email: authData.email,
-            lastLogin: Date.now(),
-            status: "Active"
-          });
+        if (enteredCode === masterFleetPIN) {
+          localStorage.setItem("rtc_session", JSON.stringify({ role: "Driver", email: authData.email, timestamp: Date.now() }));
+          navigate("/driver");
+        } else {
+          alert("Invalid Fleet PIN.");
         }
+        return;
+      }
 
-        // SAVE SESSION: Drop the digital ID card into their browser
-        localStorage.setItem("rtc_session", JSON.stringify({
-          email: authData.email,
-          role: authData.role,
-          timestamp: Date.now()
-        }));
-
-        if (authData.role === "User") navigate("/user");
-        if (authData.role === "Driver") navigate("/driver");
-        if (authData.role === "Admin") navigate("/admin");
+      if (authData.role === "Admin") {
+        const otpSnapshot = await get(child(ref(database), `temporary_otps/${safeEmail}`));
         
-      } else {
-        alert("Invalid OTP code. Please try again.");
+        if (otpSnapshot.exists() && otpSnapshot.val().code === enteredCode) {
+          await set(ref(database, `temporary_otps/${safeEmail}`), null);
+          localStorage.setItem("rtc_session", JSON.stringify({ role: "Admin", email: authData.email, timestamp: Date.now() }));
+          navigate("/admin");
+        } else {
+          alert("Invalid Admin OTP code.");
+        }
       }
     } catch (error) {
-      console.error("Error verifying OTP:", error);
+      console.error("Error verifying code:", error);
     }
   };
 
@@ -126,7 +132,7 @@ function AuthFlow() {
     return (
       <div style={{ pointerEvents: isProcessing ? 'none' : 'auto', opacity: isProcessing ? 0.7 : 1 }}>
         <AuthPage onNavigateToOTP={handleNavigateToOTP} />
-        {isProcessing && <p style={{textAlign: 'center', fontWeight: 'bold'}}>Sending secure code...</p>}
+        {isProcessing && <p style={{textAlign: 'center', fontWeight: 'bold'}}>Processing login...</p>}
       </div>
     );
   }
@@ -135,10 +141,6 @@ function AuthFlow() {
     <OTPPage email={authData.email} role={authData.role} onVerify={handleVerifyOTP} onGoBack={() => setStep("login")} />
   );
 }
-
-// -------------------------------------------------------------
-// UTILITARIAN DASHBOARDS (WITH REAL GPS)
-// -------------------------------------------------------------
 
 function UserView() {
   const navigate = useNavigate();
@@ -150,7 +152,10 @@ function UserView() {
   return (
     <div>
       <div style={{ padding: '15px', backgroundColor: 'white', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2 style={{ margin: 0, color: '#0f172a' }}>Live Transit Map</h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <img src="/logo.png" alt="RTC Logo" style={{ height: '32px' }} />
+          <h2 style={{ margin: 0, color: '#0f172a' }}>Live Transit Map</h2>
+        </div>
         <button onClick={handleLogout} style={{ background: 'none', border: 'none', color: '#ef4444', fontWeight: 'bold', cursor: 'pointer', fontSize: '16px' }}>Log Out</button>
       </div>
       <MapComponent />
@@ -212,6 +217,11 @@ function DriverDashboard() {
 
   return (
     <div style={{ padding: '20px', maxWidth: '500px', margin: '0 auto' }}>
+      
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+        <img src="/logo.png" alt="RTC Logo" style={{ height: '60px' }} />
+      </div>
+
       <div style={{ backgroundColor: 'white', padding: '30px', borderRadius: '15px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', textAlign: 'center' }}>
         <h2 style={{ margin: '0 0 20px 0', color: '#1e293b' }}>Driver Terminal</h2>
         
@@ -264,7 +274,10 @@ function AdminDashboard() {
   return (
     <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-        <h2 style={{ color: '#0f172a' }}>System Overview</h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          <img src="/logo.png" alt="RTC Logo" style={{ height: '40px' }} />
+          <h2 style={{ color: '#0f172a', margin: 0 }}>System Overview</h2>
+        </div>
         <button onClick={handleLogout} style={{ background: 'none', border: 'none', color: '#ef4444', fontWeight: 'bold', cursor: 'pointer', fontSize: '16px' }}>Log Out</button>
       </div>
       
