@@ -8,6 +8,7 @@ import AuthPage from "./AuthPage";
 import OTPPage from "./OTPPage";
 import AIChatWidget from "./AIChatWidget";
 import appLogo from "./logo.png";
+import UserDashboard from "./UserDashboard";
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
@@ -212,23 +213,16 @@ function AuthFlow() {
 
 function UserView() {
   const navigate = useNavigate();
+  
+  // Gets the saved user email so we can say "Welcome, [Name]!" on the dashboard
+  const savedSession = JSON.parse(localStorage.getItem("rtc_session") || "{}");
+
   const handleLogout = () => {
     localStorage.removeItem("rtc_session");
     navigate("/");
   };
-  return (
-    <div>
-      <div style={{ padding: '15px', backgroundColor: 'white', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <img src={appLogo} alt="RTC Logo" style={{ height: '32px' }} />
-          <h2 style={{ margin: 0, color: '#0f172a' }}>Live Transit Map</h2>
-        </div>
-        <button onClick={handleLogout} style={{ background: 'none', border: 'none', color: '#ef4444', fontWeight: 'bold', cursor: 'pointer', fontSize: '16px' }}>Log Out</button>
-      </div>
-      <MapComponent />
-      <AIChatWidget />
-    </div>
-  );
+
+  return <UserDashboard userEmail={savedSession.email} onLogout={handleLogout} />;
 }
 
 function DriverDashboard() {
