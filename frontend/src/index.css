@@ -238,3 +238,21 @@ input:focus {
     font-weight: 600;
     margin-top: 15px;
 }
+@keyframes splashFade {
+  0% { 
+    opacity: 0; 
+    transform: scale(0.85); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
+}
+/* Responsive full-screen fix */
+html, body, #root {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}

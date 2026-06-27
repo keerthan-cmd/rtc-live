@@ -7,7 +7,35 @@ import MapComponent from "./MapComponent";
 import AuthPage from "./AuthPage";
 import OTPPage from "./OTPPage";
 
+// The hard-linked logo from your src folder
+import appLogo from "./logo.png";
+
 export default function App() {
+  const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (showSplash) {
+    return (
+      <div style={{ height: "100vh", display: "flex", justifyContent: "center", alignItems: "center", backgroundColor: "#f1f5f9" }}>
+        <img 
+          src={appLogo} 
+          alt="RTC Logo Splash" 
+          style={{ 
+            width: "200px", 
+            maxWidth: "80%", 
+            animation: "splashFade 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards" 
+          }} 
+        />
+      </div>
+    );
+  }
+
   return (
     <Router>
       <div style={{ fontFamily: "sans-serif", color: "#333", backgroundColor: "#f1f5f9", minHeight: "100vh" }}>
@@ -128,9 +156,18 @@ function AuthFlow() {
     }
   };
 
+  // Flexbox applied to center the forms
   if (step === "login") {
     return (
-      <div style={{ pointerEvents: isProcessing ? 'none' : 'auto', opacity: isProcessing ? 0.7 : 1 }}>
+      <div style={{ 
+        pointerEvents: isProcessing ? 'none' : 'auto', 
+        opacity: isProcessing ? 0.7 : 1,
+        display: "flex", 
+        flexDirection: "column", 
+        justifyContent: "center", 
+        alignItems: "center", 
+        minHeight: "100vh" 
+      }}>
         <AuthPage onNavigateToOTP={handleNavigateToOTP} />
         {isProcessing && <p style={{textAlign: 'center', fontWeight: 'bold'}}>Processing login...</p>}
       </div>
@@ -138,7 +175,9 @@ function AuthFlow() {
   }
 
   return (
-    <OTPPage email={authData.email} role={authData.role} onVerify={handleVerifyOTP} onGoBack={() => setStep("login")} />
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
+      <OTPPage email={authData.email} role={authData.role} onVerify={handleVerifyOTP} onGoBack={() => setStep("login")} />
+    </div>
   );
 }
 
@@ -153,7 +192,7 @@ function UserView() {
     <div>
       <div style={{ padding: '15px', backgroundColor: 'white', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <img src="/logo.png" alt="RTC Logo" style={{ height: '32px' }} />
+          <img src={appLogo} alt="RTC Logo" style={{ height: '32px' }} />
           <h2 style={{ margin: 0, color: '#0f172a' }}>Live Transit Map</h2>
         </div>
         <button onClick={handleLogout} style={{ background: 'none', border: 'none', color: '#ef4444', fontWeight: 'bold', cursor: 'pointer', fontSize: '16px' }}>Log Out</button>
@@ -219,7 +258,7 @@ function DriverDashboard() {
     <div style={{ padding: '20px', maxWidth: '500px', margin: '0 auto' }}>
       
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
-        <img src="/logo.png" alt="RTC Logo" style={{ height: '60px' }} />
+        <img src={appLogo} alt="RTC Logo" style={{ height: '60px' }} />
       </div>
 
       <div style={{ backgroundColor: 'white', padding: '30px', borderRadius: '15px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', textAlign: 'center' }}>
@@ -275,7 +314,7 @@ function AdminDashboard() {
     <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          <img src="/logo.png" alt="RTC Logo" style={{ height: '40px' }} />
+          <img src={appLogo} alt="RTC Logo" style={{ height: '40px' }} />
           <h2 style={{ color: '#0f172a', margin: 0 }}>System Overview</h2>
         </div>
         <button onClick={handleLogout} style={{ background: 'none', border: 'none', color: '#ef4444', fontWeight: 'bold', cursor: 'pointer', fontSize: '16px' }}>Log Out</button>
