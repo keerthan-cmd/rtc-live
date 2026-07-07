@@ -1,0 +1,22 @@
+Directory structure:
+└── keerthan-cmd-rtc-live/
+    ├── package.json
+    ├── Untitled-1.py
+    ├── Untitled-1.txt
+    └── frontend/
+        ├── README.md
+        ├── eslint.config.js
+        ├── index.html
+        ├── package.json
+        ├── vite.config.js
+        └── src/
+            ├── AIChatWidget.jsx
+            ├── App.css
+            ├── App.jsx
+            ├── AuthPage.jsx
+            ├── firebase.js
+            ├── index.css
+            ├── main.jsx
+            ├── MapComponent.jsx
+            ├── OTPPage.jsx
+            └── UserDashboard.jsx
