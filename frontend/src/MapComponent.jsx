@@ -4,21 +4,24 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { database, ref, onValue } from "./firebase";
 
-// Load the bus icon
-const busIcon = new L.Icon({
-  iconUrl: "https://cdn-icons-png.flaticon.com/512/3448/3448339.png", 
-  iconSize: [40, 40],
-  iconAnchor: [20, 20]
+// Animated Pulsing Dot Icon for Live Buses
+const pulsingIcon = new L.divIcon({
+  className: "custom-pulsing-icon",
+  html: `<div class="pulse-ring"></div><div class="pulse-dot"></div>`,
+  iconSize: [24, 24],
+  iconAnchor: [12, 12]
 });
 
-// This is the GPS path the bus will follow (Simulated Vizag Route)
+// Real-world simulated route (Gajuwaka to RTC Complex)
 const routePath = [
-  [17.7231, 83.3012], 
-  [17.7246, 83.3027],
-  [17.7261, 83.3042],
-  [17.7276, 83.3057],
-  [17.7291, 83.3072],
-  [17.7306, 83.3087]  
+  [17.6896, 83.2086], // Gajuwaka
+  [17.7011, 83.2154], // Sheela Nagar
+  [17.7126, 83.2268], // BHPV
+  [17.7215, 83.2421], // Airport Rd
+  [17.7285, 83.2573], // NAD
+  [17.7342, 83.2751], // Kancharapalem
+  [17.7261, 83.3042], // Maddilapalem
+  [17.7111, 83.3197]  // RTC Complex
 ];
 
 export default function MapComponent() {
@@ -38,33 +41,41 @@ export default function MapComponent() {
   }, []);
 
   return (
-    <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
+    <div style={{ height: "100%", width: "100%", position: "relative" }}>
+      <style>{`
+        .custom-pulsing-icon { display: flex; align-items: center; justify-content: center; }
+        .pulse-ring {
+          position: absolute; width: 40px; height: 40px; background-color: rgba(16, 185, 129, 0.4);
+          border-radius: 50%; animation: pulse-anim 1.5s ease-out infinite;
+        }
+        .pulse-dot { position: absolute; width: 14px; height: 14px; background-color: #10b981; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+        @keyframes pulse-anim { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
+        .leaflet-container { background: #0f172a !important; }
+      `}</style>
       <MapContainer 
-        center={[17.7261, 83.3042]} 
-        zoom={15} 
-        style={{ height: "60vh", width: "100%", borderRadius: "15px", border: "4px solid #1e293b", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}
+        center={[17.7285, 83.2573]} 
+        zoom={12} 
+        style={{ height: "100%", width: "100%" }}
+        zoomControl={false}
       >
         <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; OpenStreetMap'
+          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
         />
         
-        {/* Draw the actual route line! */}
         <Polyline 
           positions={routePath} 
           color="#3b82f6" 
-          weight={6} 
+          weight={4} 
           opacity={0.8} 
-          dashArray="10, 10" 
         />
         
-        {/* Draw the live buses */}
         {Object.entries(buses).map(([busNumber, busData]) => (
-          <Marker key={busNumber} position={[busData.lat, busData.lng]} icon={busIcon}>
-            <Popup>
-              <div style={{ textAlign: "center" }}>
-                <b style={{ fontSize: "16px" }}>Bus {busNumber}</b><br/>
-                <span style={{ color: "#16a34a", fontWeight: "bold" }}>● {busData.status}</span>
+          <Marker key={busNumber} position={[busData.lat, busData.lng]} icon={pulsingIcon}>
+            <Popup className="dark-popup">
+              <div style={{ textAlign: "center", padding: '5px' }}>
+                <b style={{ fontSize: "16px", color: '#0f172a' }}>Route {busNumber}</b><br/>
+                <span style={{ color: "#10b981", fontWeight: "bold", fontSize: '12px' }}>● {busData.status || 'Active'}</span>
               </div>
             </Popup>
           </Marker>

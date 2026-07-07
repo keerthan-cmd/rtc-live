@@ -1,11 +1,12 @@
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #cbd5e1; 
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    background-color: #f1f5f9; 
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     margin: 0;
+    -webkit-font-smoothing: antialiased;
 }
 
 .app-screen {
@@ -27,50 +28,23 @@ body {
 }
 
 .card {
-    background: #f8fafc; 
-    padding: 45px 20px 30px; 
-    border: 6px solid #1e293b; 
-    border-radius: 25px 25px 12px 12px; 
+    background: #ffffff; 
+    padding: 40px 30px; 
+    border-radius: 24px; 
     width: 100%; 
     box-sizing: border-box;
     position: relative;
     margin-bottom: 20px; 
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-}
-
-.bus-destination {
-    position: absolute;
-    top: 12px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #111827;
-    color: #fde047; 
-    font-size: 10px;
-    font-weight: 800;
-    padding: 4px 16px;
-    border-radius: 6px;
-    letter-spacing: 1.5px;
-    border: 2px solid #334155; 
+    box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+    border: 1px solid #e2e8f0;
 }
 
 .divider-line {
-    width: 80%;
-    height: 1.5px;
-    background: linear-gradient(90deg, transparent, #64748b, transparent);
-    margin: 0 auto 15px auto;
-    opacity: 0.6;
+    width: 100%;
+    height: 1px;
+    background: #e2e8f0;
+    margin: 20px 0;
 }
-
-.wheel {
-    position: absolute;
-    bottom: -24px; 
-    width: 42px; 
-    height: 22px; 
-    background-color: #0f172a;
-    border-radius: 6px;
-}
-.left-wheel { left: 20px; }
-.right-wheel { right: 20px; }
 
 .toggle-group, .role-group {
     display: flex;
@@ -140,22 +114,7 @@ input:focus {
 }
 .main-btn:hover { background: #059669; }
 
-.bumper-area {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 15px; 
-    margin-top: 25px;
-}
 
-.headlight {
-    width: 18px;
-    height: 18px;
-    background-color: #fef08a; 
-    border: 2px solid #1e293b; 
-    border-radius: 50%;
-    box-shadow: 0 0 10px rgba(253, 224, 71, 0.7); 
-}
 
 .forgot-link {
     background-color: #facc15; 

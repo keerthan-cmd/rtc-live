@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist",
+    "simulate": "node src/simulator.js"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",

@@ -228,6 +228,7 @@ function UserView() {
 function DriverDashboard() {
   const [busNumber, setBusNumber] = useState("");
   const [isTracking, setIsTracking] = useState(false);
+  const [passengers, setPassengers] = useState(12);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -241,30 +242,61 @@ function DriverDashboard() {
       if (!navigator.geolocation) { alert("GPS tracking not supported."); setIsTracking(false); return; }
       watchId = navigator.geolocation.watchPosition(
         (position) => {
-          set(ref(database, `buses/${busNumber}`), { lat: position.coords.latitude, lng: position.coords.longitude, lastUpdated: Date.now(), status: "Active" });
+          set(ref(database, `buses/${busNumber}`), { lat: position.coords.latitude, lng: position.coords.longitude, lastUpdated: Date.now(), status: "On Route" });
         },
         (error) => { console.error(error); alert("Location error."); setIsTracking(false); },
         { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
       );
+    } else if (!isTracking && busNumber) {
+        set(ref(database, `buses/${busNumber}`), null); // Remove bus from map when offline
     }
     return () => { if (watchId !== null) navigator.geolocation.clearWatch(watchId); };
   }, [isTracking, busNumber]);
 
   return (
-    <div style={{ padding: '20px', maxWidth: '500px', margin: '0 auto' }}>
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
-        <img src={appLogo} alt="RTC Logo" style={{ height: '60px' }} />
+    <div style={{ backgroundColor: '#0f172a', minHeight: '100vh', color: 'white', padding: '20px', fontFamily: "'Inter', sans-serif" }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
+         <div style={{ fontSize: '24px', fontWeight: '900', letterSpacing: '1px' }}>RTC <span style={{ color: '#10b981' }}>DRIVER</span></div>
+         <button onClick={handleLogout} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white', padding: '8px 16px', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold' }}>Sign Out</button>
       </div>
-      <div style={{ backgroundColor: 'white', padding: '30px', borderRadius: '15px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', textAlign: 'center' }}>
-        <h2 style={{ margin: '0 0 20px 0', color: '#1e293b' }}>Driver Terminal</h2>
-        <input type="text" placeholder="Bus Route (e.g. 38Y)" value={busNumber} onChange={(e) => setBusNumber(e.target.value.toUpperCase())} disabled={isTracking} style={{ padding: '15px', marginBottom: '20px', fontSize: '18px', width: '100%', borderRadius: '8px', border: '2px solid #e2e8f0', boxSizing: 'border-box' }} />
-        <button onClick={() => setIsTracking(!isTracking)} disabled={!busNumber} style={{ width: '100%', padding: '15px', backgroundColor: isTracking ? '#ef4444' : '#10b981', color: 'white', border: 'none', borderRadius: '8px', fontSize: '18px', fontWeight: 'bold', cursor: 'pointer' }}>
-          {isTracking ? "End Route Broadcast" : "Start Live Broadcast"}
-        </button>
-        {isTracking && <div style={{ marginTop: '20px', padding: '10px', backgroundColor: '#ecfdf5', color: '#047857', borderRadius: '8px', fontWeight: 'bold' }}>● Broadcasting live GPS location</div>}
-      </div>
-      <div style={{ textAlign: 'center', marginTop: '20px' }}>
-        <button onClick={handleLogout} style={{ background: 'none', border: 'none', color: '#64748b', fontWeight: 'bold', cursor: 'pointer', fontSize: '16px' }}>Log Out</button>
+
+      <div style={{ maxWidth: '500px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div style={{ backgroundColor: '#1e293b', padding: '30px', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.3)', border: '1px solid #334155' }}>
+          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+             <h2 style={{ margin: 0, fontSize: '32px', fontWeight: '800' }}>{isTracking ? 'Online' : 'Offline'}</h2>
+             <p style={{ color: '#94a3b8', margin: '5px 0 0 0' }}>{isTracking ? 'Broadcasting live location' : 'Enter route to start'}</p>
+          </div>
+
+          <input 
+            type="text" 
+            placeholder="Route (e.g. 38Y)" 
+            value={busNumber} 
+            onChange={(e) => setBusNumber(e.target.value.toUpperCase())} 
+            disabled={isTracking} 
+            style={{ padding: '18px', marginBottom: '20px', fontSize: '20px', width: '100%', borderRadius: '12px', border: '2px solid #334155', backgroundColor: '#0f172a', color: 'white', boxSizing: 'border-box', textAlign: 'center', fontWeight: 'bold', textTransform: 'uppercase' }} 
+          />
+          
+          <button 
+            onClick={() => setIsTracking(!isTracking)} 
+            disabled={!busNumber} 
+            style={{ width: '100%', padding: '20px', backgroundColor: isTracking ? '#ef4444' : '#10b981', color: 'white', border: 'none', borderRadius: '16px', fontSize: '20px', fontWeight: '900', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '1px', transition: 'transform 0.2s, box-shadow 0.2s', boxShadow: isTracking ? '0 10px 25px rgba(239, 68, 68, 0.4)' : '0 10px 25px rgba(16, 185, 129, 0.4)' }}
+          >
+            {isTracking ? "Go Offline" : "Go Online"}
+          </button>
+        </div>
+
+        {isTracking && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+             <div style={{ backgroundColor: '#1e293b', padding: '20px', borderRadius: '20px', textAlign: 'center', border: '1px solid #334155' }}>
+                <div style={{ fontSize: '12px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 'bold' }}>Next Stop</div>
+                <div style={{ fontSize: '18px', fontWeight: '800', marginTop: '5px', color: '#3b82f6' }}>RTC Complex</div>
+             </div>
+             <div style={{ backgroundColor: '#1e293b', padding: '20px', borderRadius: '20px', textAlign: 'center', border: '1px solid #334155' }}>
+                <div style={{ fontSize: '12px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 'bold' }}>Est. Load</div>
+                <div style={{ fontSize: '24px', fontWeight: '900', marginTop: '5px' }}>{passengers}</div>
+             </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -273,34 +305,74 @@ function DriverDashboard() {
 function AdminDashboard() {
   const [activeBuses, setActiveBuses] = useState({});
   const navigate = useNavigate();
+
   const handleLogout = () => {
     localStorage.removeItem("rtc_session");
     navigate("/");
   };
+
   useEffect(() => {
     const unsubscribe = onValue(ref(database, 'buses'), (snapshot) => { setActiveBuses(snapshot.val() || {}); });
     return () => unsubscribe(); 
   }, []);
+
   return (
-    <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+    <div style={{ backgroundColor: '#f8fafc', minHeight: '100vh', fontFamily: "'Inter', sans-serif" }}>
+      <div style={{ backgroundColor: '#ffffff', padding: '20px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0', position: 'sticky', top: 0, zIndex: 100 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          <img src={appLogo} alt="RTC Logo" style={{ height: '40px' }} />
-          <h2 style={{ color: '#0f172a', margin: 0 }}>System Overview</h2>
+          <div style={{ backgroundColor: '#10b981', color: 'white', padding: '10px', borderRadius: '12px', fontWeight: '900', fontSize: '20px' }}>RTC</div>
+          <h2 style={{ color: '#0f172a', margin: 0, fontSize: '20px', fontWeight: '800' }}>Fleet Command</h2>
         </div>
-        <button onClick={handleLogout} style={{ background: 'none', border: 'none', color: '#ef4444', fontWeight: 'bold', cursor: 'pointer', fontSize: '16px' }}>Log Out</button>
+        <button onClick={handleLogout} style={{ background: '#f1f5f9', border: 'none', color: '#ef4444', fontWeight: 'bold', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', transition: 'background 0.2s' }}>Log Out</button>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
-        <div style={{ backgroundColor: '#1e293b', padding: '30px', borderRadius: '15px', color: 'white', textAlign: 'center', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}>
-          <h1 style={{ fontSize: '48px', margin: '0', color: '#10b981' }}>{Object.keys(activeBuses).length}</h1>
-          <p style={{ margin: '10px 0 0 0', fontWeight: '600' }}>Active Vehicles</p>
+
+      <div style={{ padding: '40px', maxWidth: '1200px', margin: '0 auto' }}>
+        
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px', marginBottom: '40px' }}>
+          <div style={{ backgroundColor: '#1e293b', padding: '30px', borderRadius: '20px', color: 'white', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', position: 'relative', overflow: 'hidden' }}>
+            <h1 style={{ fontSize: '56px', margin: '0', color: '#10b981', lineHeight: '1' }}>{Object.keys(activeBuses).length}</h1>
+            <p style={{ margin: '10px 0 0 0', fontWeight: '600', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '1px' }}>Active Vehicles</p>
+            <div style={{ position: 'absolute', right: '-20px', bottom: '-20px', fontSize: '100px', opacity: '0.1' }}>🚌</div>
+          </div>
+          
+          <div style={{ backgroundColor: '#ffffff', padding: '30px', borderRadius: '20px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
+            <h1 style={{ fontSize: '40px', margin: '0', color: '#0f172a', lineHeight: '1' }}>98.2%</h1>
+            <p style={{ margin: '10px 0 0 0', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px' }}>On-Time Performance</p>
+          </div>
+          
+          <div style={{ backgroundColor: '#ffffff', padding: '30px', borderRadius: '20px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
+             <h1 style={{ fontSize: '40px', margin: '0', color: '#ef4444', lineHeight: '1' }}>0</h1>
+             <p style={{ margin: '10px 0 0 0', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px' }}>Active Alerts</p>
+          </div>
         </div>
-        <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '15px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
-          <h3 style={{ margin: '0 0 15px 0', borderBottom: '2px solid #f1f5f9', paddingBottom: '10px' }}>Live Roster</h3>
-          <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
-            {Object.keys(activeBuses).length === 0 ? <p style={{ color: '#94a3b8' }}>No active buses.</p> : null}
-            {Object.keys(activeBuses).map(bus => (
-              <div key={bus} style={{ padding: '10px', backgroundColor: '#f8fafc', borderRadius: '8px', marginBottom: '8px', fontWeight: 'bold', color: '#334155' }}>🚌 Route {bus}</div>
+
+        <div style={{ backgroundColor: 'white', padding: '30px', borderRadius: '20px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '2px solid #f1f5f9', paddingBottom: '15px' }}>
+             <h3 style={{ margin: 0, fontSize: '20px', color: '#0f172a' }}>Live Roster</h3>
+             <span style={{ backgroundColor: '#ecfdf5', color: '#059669', padding: '6px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 'bold' }}>Auto-updating</span>
+          </div>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {Object.keys(activeBuses).length === 0 ? (
+               <div style={{ padding: '40px', textAlign: 'center', color: '#94a3b8', backgroundColor: '#f8fafc', borderRadius: '12px' }}>
+                 <div style={{ fontSize: '40px', marginBottom: '10px' }}>😴</div>
+                 No vehicles currently on route.
+               </div>
+            ) : null}
+            {Object.entries(activeBuses).map(([bus, data]) => (
+              <div key={bus} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', backgroundColor: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                 <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                    <div style={{ width: '40px', height: '40px', backgroundColor: '#e0e7ff', color: '#4f46e5', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>{bus.substring(0,2)}</div>
+                    <div>
+                       <div style={{ fontWeight: '800', color: '#0f172a', fontSize: '16px' }}>Route {bus}</div>
+                       <div style={{ fontSize: '12px', color: '#64748b' }}>Lat: {data.lat.toFixed(4)}, Lng: {data.lng.toFixed(4)}</div>
+                    </div>
+                 </div>
+                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ width: '8px', height: '8px', backgroundColor: '#10b981', borderRadius: '50%', display: 'inline-block' }}></span>
+                    <span style={{ color: '#10b981', fontWeight: 'bold', fontSize: '14px' }}>{data.status || 'Active'}</span>
+                 </div>
+              </div>
             ))}
           </div>
         </div>
