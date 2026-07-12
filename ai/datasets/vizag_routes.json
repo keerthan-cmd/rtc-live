@@ -14,9 +14,22 @@
       "fare_range": "\u20b910 - \u20b940",
       "stops": [
         "Visakhapatnam Airport",
-        "NAD",
-        "Gurudwara",
+        "Airport Junction",
+        "BHPV",
+        "NAD Junction",
+        "Karasa",
+        "Marripalem",
+        "Vuda Colony",
+        "R&B",
+        "Kancharapalem",
+        "Urvasi",
+        "Thatichetlapalem",
+        "Railway Station",
         "RTC Complex",
+        "Jagadamba",
+        "Women's College",
+        "Siripuram",
+        "VUDA Park",
         "R K Beach"
       ]
     },
@@ -30,9 +43,15 @@
       "stops": [
         "RTC Complex",
         "Jagadamba",
+        "Women's College",
+        "Siripuram",
+        "AIR",
+        "Pandurangapuram",
         "RK Beach",
         "VUDA Park",
+        "Shanti Ashram",
         "Tenneti Park",
+        "Jodugullapalem",
         "Kailasagiri"
       ]
     },
@@ -45,11 +64,25 @@
       "fare_range": "\u20b910 - \u20b940",
       "stops": [
         "Kurmannapalem",
+        "Vadlapudi",
+        "Old Gajuwaka",
         "Gajuwaka",
-        "NAD",
-        "Gurudwara",
-        "Zoo Park",
+        "BHPV",
+        "Airport",
+        "NAD Junction",
+        "Karasa",
+        "Marripalem",
+        "Kancharapalem",
+        "Thatichetlapalem",
+        "Railway Station",
+        "RTC Complex",
+        "Maddilapalem",
+        "Hanumanthuwaka",
+        "Yendada",
+        "PM Palem",
         "Madhurawada",
+        "Kommadi",
+        "Marikavalasa",
         "Tagarapuvalasa"
       ]
     },
@@ -62,10 +95,17 @@
       "fare_range": "\u20b910 - \u20b940",
       "stops": [
         "RTC Complex",
-        "NAD",
-        "Gopalapatnam Bus Stop",
+        "Railway Station",
+        "Thatichetlapalem",
+        "Kancharapalem",
+        "R&B",
+        "Marripalem",
+        "NAD Junction",
+        "Gopalapatnam",
+        "Vepagunta",
         "Pendurthi",
         "Kothavalasa",
+        "Bheemasingi",
         "Anandapuram",
         "Devarapalle"
       ]
@@ -79,10 +119,18 @@
       "fare_range": "\u20b910 - \u20b940",
       "stops": [
         "Town Kotharoad",
+        "Kurupam Market",
+        "Old Post Office",
+        "Jagadamba",
+        "RTC Complex",
         "Railway Station",
+        "Thatichetlapalem",
         "Kancharapalem",
-        "NAD",
+        "R&B",
+        "Marripalem",
+        "NAD Junction",
         "Gopalapatnam",
+        "Vepagunta",
         "Pendurthi",
         "Kothavalasa"
       ]
@@ -96,12 +144,15 @@
       "fare_range": "\u20b910 - \u20b940",
       "stops": [
         "Venkojipalem",
+        "Hanumanthuwaka",
+        "Maddilapalem",
         "MVP Colony",
         "Pedda Waltair",
-        "AU Outgate",
+        "Siripuram",
+        "Women's College",
         "Jagadamba",
-        "Town Kotharoad",
-        "Old Post Office"
+        "Old Post Office",
+        "Town Kotharoad"
       ]
     },
     {
@@ -113,12 +164,17 @@
       "fare_range": "\u20b910 - \u20b940",
       "stops": [
         "Arilova Colony",
+        "Arilova",
+        "Hanumanthuwaka",
         "Venkojipalem",
+        "Maddilapalem",
         "MVP Colony",
-        "AU Out Gate",
+        "Pedda Waltair",
+        "Siripuram",
+        "Women's College",
         "Jagadamba",
-        "Town Kotharoad",
-        "Old Post Office"
+        "Old Post Office",
+        "Town Kotharoad"
       ]
     },
     {
@@ -130,6 +186,8 @@
       "fare_range": "\u20b910 - \u20b940",
       "stops": [
         "Purna Market",
+        "Town Kotharoad",
+        "Old Post Office",
         "Convent Junction",
         "Scindia",
         "Naval Base",
@@ -146,11 +204,18 @@
       "stops": [
         "VUDA Park",
         "RK Beach",
+        "Pandurangapuram",
+        "AIR",
+        "Siripuram",
+        "Women's College",
         "Jagadamba",
+        "Old Post Office",
         "Town Kotharoad",
-        "Convent",
+        "Convent Junction",
         "Scindia",
+        "Naval Base",
         "Gajuwaka",
+        "Old Gajuwaka",
         "Kapulatunglam"
       ]
     },
@@ -165,10 +230,11 @@
         "HB Colony",
         "Seethammadhara",
         "Satyam Junction",
+        "Gurudwara",
         "RTC Complex",
         "Jagadamba",
-        "Town Kotharoad",
-        "Old Post Office"
+        "Old Post Office",
+        "Town Kotharoad"
       ]
     },
     {
@@ -180,9 +246,16 @@
       "fare_range": "\u20b910 - \u20b940",
       "stops": [
         "Railway Station",
+        "Thatichetlapalem",
         "RTC Complex",
+        "Gurudwara",
         "Maddilapalem",
+        "Hanumanthuwaka",
+        "Yendada",
+        "PM Palem",
         "Madhurawada",
+        "Kommadi",
+        "Marikavalasa",
         "Tagarapuvalasa",
         "Vizianagaram"
       ]
@@ -196,10 +269,20 @@
       "fare_range": "\u20b910 - \u20b940",
       "stops": [
         "RK Beach",
-        "Jagadamba Centre",
+        "Pandurangapuram",
+        "AIR",
+        "Siripuram",
+        "Women's College",
+        "Jagadamba",
         "RTC Complex",
-        "NAD",
+        "Railway Station",
+        "Thatichetlapalem",
+        "Kancharapalem",
+        "R&B",
+        "Marripalem",
+        "NAD Junction",
         "Gopalapatnam",
+        "Vepagunta",
         "Simhachalam Bus Station"
       ]
     },
@@ -212,10 +295,20 @@
       "fare_range": "\u20b910 - \u20b940",
       "stops": [
         "RK Beach",
+        "Pandurangapuram",
+        "AIR",
+        "Siripuram",
+        "Women's College",
         "Jagadamba",
         "RTC Complex",
-        "NAD",
+        "Railway Station",
+        "Thatichetlapalem",
+        "Kancharapalem",
+        "R&B",
+        "Marripalem",
+        "NAD Junction",
         "Gopalapatnam",
+        "Vepagunta",
         "Pendurthi"
       ]
     },
@@ -228,9 +321,19 @@
       "fare_range": "\u20b910 - \u20b940",
       "stops": [
         "Kothavalasa",
-        "NAD",
+        "Pendurthi",
+        "Vepagunta",
+        "Gopalapatnam",
+        "NAD Junction",
+        "Marripalem",
+        "R&B",
+        "Kancharapalem",
+        "Thatichetlapalem",
+        "Railway Station",
         "RTC Complex",
         "Jagadamba",
+        "Women's College",
+        "Siripuram",
         "RK Beach"
       ]
     },
@@ -243,10 +346,17 @@
       "fare_range": "\u20b910 - \u20b940",
       "stops": [
         "Simhachalam Hill Top",
-        "Simhachalam",
-        "NAD",
-        "Gurudwara",
+        "Simhachalam Bus Station",
+        "Vepagunta",
+        "Gopalapatnam",
+        "NAD Junction",
+        "Karasa",
+        "Marripalem",
+        "Kancharapalem",
+        "Thatichetlapalem",
+        "Railway Station",
         "RTC Complex",
+        "Jagadamba",
         "Zilla Parishad"
       ]
     },
@@ -259,9 +369,16 @@
       "fare_range": "\u20b910 - \u20b940",
       "stops": [
         "Gajuwaka",
-        "NAD",
+        "Old Gajuwaka",
+        "Vadlapudi",
         "BHPV",
-        "Gurudwara",
+        "Airport",
+        "NAD Junction",
+        "Karasa",
+        "Marripalem",
+        "Kancharapalem",
+        "Thatichetlapalem",
+        "Railway Station",
         "RTC Complex"
       ]
     },
@@ -274,9 +391,18 @@
       "fare_range": "\u20b910 - \u20b940",
       "stops": [
         "RTC Complex",
-        "Gurudwara",
-        "NAD",
+        "Railway Station",
+        "Thatichetlapalem",
+        "Akkayapalem",
+        "Kancharapalem",
+        "Marripalem",
+        "Karasa",
+        "NAD Junction",
+        "Airport",
+        "BHPV",
         "Gajuwaka",
+        "Old Gajuwaka",
+        "Vadlapudi",
         "Duvvada Railway Station"
       ]
     },
@@ -292,7 +418,9 @@
         "Muralinagar",
         "Kailasapuram",
         "Akkayapalem",
+        "80 Feet Road",
         "RTC Complex",
+        "Jagadamba",
         "Old Post Office"
       ]
     },
@@ -305,7 +433,11 @@
       "fare_range": "\u20b910 - \u20b940",
       "stops": [
         "Old Post Office",
+        "Town Kotharoad",
+        "Jagadamba",
+        "Women's College",
         "RTC Complex",
+        "Gurudwara",
         "Maddilapalem",
         "Hanumanthuwaka",
         "Ravindra Nagar"
@@ -320,9 +452,15 @@
       "fare_range": "\u20b910 - \u20b940",
       "stops": [
         "Scindia",
+        "Naval Base",
         "Gajuwaka",
-        "NAD",
+        "Old Gajuwaka",
+        "Vadlapudi",
+        "BHPV",
+        "Airport",
+        "NAD Junction",
         "Gopalapatnam",
+        "Vepagunta",
         "Simhachalam"
       ]
     },
@@ -335,8 +473,16 @@
       "fare_range": "\u20b910 - \u20b940",
       "stops": [
         "Kothavalasa",
-        "NAD",
+        "Pendurthi",
+        "Vepagunta",
+        "Gopalapatnam",
+        "NAD Junction",
+        "Airport",
+        "BHPV",
         "Gajuwaka",
+        "Old Gajuwaka",
+        "Vadlapudi",
+        "Naval Base",
         "Scindia"
       ]
     },
@@ -349,7 +495,12 @@
       "fare_range": "\u20b910 - \u20b940",
       "stops": [
         "Old Gajuwaka",
-        "NAD",
+        "Gajuwaka",
+        "BHPV",
+        "Airport",
+        "NAD Junction",
+        "Gopalapatnam",
+        "Vepagunta",
         "Pendurthi",
         "Sontyam",
         "Anandapuram",
@@ -365,9 +516,17 @@
       "fare_range": "\u20b910 - \u20b940",
       "stops": [
         "Simhachalam",
-        "NAD",
+        "Vepagunta",
+        "Gopalapatnam",
+        "NAD Junction",
+        "Karasa",
+        "Marripalem",
+        "R&B",
         "Kancharapalem",
+        "Thatichetlapalem",
         "Railway Station",
+        "RTC Complex",
+        "Jagadamba",
         "Town Kotharoad"
       ]
     },
@@ -380,8 +539,15 @@
       "fare_range": "\u20b910 - \u20b940",
       "stops": [
         "Simhachalam Hill Top",
-        "Simhachalam",
-        "NAD",
+        "Simhachalam Bus Station",
+        "Vepagunta",
+        "Gopalapatnam",
+        "NAD Junction",
+        "Karasa",
+        "Marripalem",
+        "R&B",
+        "Kancharapalem",
+        "Thatichetlapalem",
         "Convent Junction",
         "Old Post Office"
       ]
@@ -395,7 +561,10 @@
       "fare_range": "\u20b910 - \u20b940",
       "stops": [
         "Arilova Colony",
+        "Arilova",
+        "Hanumanthuwaka",
         "Maddilapalem",
+        "Gurudwara",
         "RTC Complex",
         "Jagadamba",
         "Old Post Office"
@@ -410,7 +579,13 @@
       "fare_range": "\u20b910 - \u20b940",
       "stops": [
         "RK Beach",
+        "Pandurangapuram",
+        "AIR",
+        "Siripuram",
+        "Women's College",
+        "Jagadamba",
         "RTC Complex",
+        "Gurudwara",
         "Maddilapalem",
         "Hanumanthuwaka",
         "Simhachalam",
@@ -428,6 +603,8 @@
       "fare_range": "\u20b910 - \u20b940",
       "stops": [
         "Vizianagaram",
+        "Tagarapuvalasa",
+        "Anandapuram",
         "Bheemasingi",
         "Kothavalasa",
         "Pendurthi",
@@ -446,7 +623,14 @@
         "Chodavaram",
         "Sabbavaram",
         "Pendurthi",
-        "NAD",
+        "Vepagunta",
+        "Gopalapatnam",
+        "NAD Junction",
+        "Karasa",
+        "Marripalem",
+        "Kancharapalem",
+        "Thatichetlapalem",
+        "Railway Station",
         "RTC Complex"
       ]
     },
@@ -461,9 +645,17 @@
         "Sabbavaram",
         "Narava",
         "Old Gopalapatnam",
-        "NAD",
+        "Gopalapatnam",
+        "NAD Junction",
+        "Karasa",
+        "Marripalem",
         "Kancharapalem",
+        "Thatichetlapalem",
+        "Railway Station",
         "RTC Complex",
+        "Jagadamba",
+        "Women's College",
+        "Siripuram",
         "RK Beach"
       ]
     },
@@ -476,7 +668,9 @@
       "fare_range": "\u20b910 - \u20b940",
       "stops": [
         "Scindia",
+        "Naval Base",
         "Gajuwaka",
+        "Old Gajuwaka",
         "Kurmannapalem",
         "Duvvada",
         "Sabbavaram",
@@ -493,8 +687,12 @@
       "stops": [
         "RTC Complex",
         "Railway Station",
+        "Thatichetlapalem",
+        "Convent Junction",
         "Scindia",
+        "Naval Base",
         "Gajuwaka",
+        "Old Gajuwaka",
         "Rajeev Nagar"
       ]
     },
@@ -508,7 +706,14 @@
       "stops": [
         "Maddilapalem",
         "Gurudwara",
-        "NAD",
+        "RTC Complex",
+        "Railway Station",
+        "Thatichetlapalem",
+        "Kancharapalem",
+        "Marripalem",
+        "NAD Junction",
+        "Gopalapatnam",
+        "Vepagunta",
         "Pendurthi",
         "Kothavalasa"
       ]
@@ -523,8 +728,10 @@
       "stops": [
         "Anakapalli",
         "Aganampudi",
-        "Gajuwaka",
         "Kurmannapalem",
+        "Old Gajuwaka",
+        "Gajuwaka",
+        "Naval Base",
         "Scindia"
       ]
     },
@@ -537,8 +744,13 @@
       "fare_range": "\u20b910 - \u20b940",
       "stops": [
         "Vizianagaram",
+        "Tagarapuvalasa",
         "Anandapuram",
+        "Marikavalasa",
+        "Kommadi",
         "Madhurawada",
+        "PM Palem",
+        "Yendada",
         "Hanumanthuwaka",
         "Simhachalam Hill Top"
       ]
@@ -572,6 +784,8 @@
         "Rushikonda",
         "Sagarnagar",
         "MVP Colony",
+        "Maddilapalem",
+        "Gurudwara",
         "RTC Complex",
         "Railway Station"
       ]
@@ -586,8 +800,12 @@
       "stops": [
         "Ratnagiri HB Colony",
         "PM Palem",
-        "Endada",
+        "Yendada",
+        "Hanumanthuwaka",
         "Maddilapalem",
+        "Gurudwara",
+        "RTC Complex",
+        "Jagadamba",
         "Old Post Office"
       ]
     },
@@ -600,7 +818,13 @@
       "fare_range": "\u20b910 - \u20b940",
       "stops": [
         "Vizianagaram",
+        "Tagarapuvalasa",
         "Anandapuram",
+        "Marikavalasa",
+        "Kommadi",
+        "Madhurawada",
+        "PM Palem",
+        "Yendada",
         "Hanumanthuwaka",
         "Simhachalam"
       ]

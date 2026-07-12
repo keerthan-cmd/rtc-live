@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import STOPS_DATA from "./data/stops.json";
+import STOPS_TE from "./data/stops_te.json";
 import ROUTES_DATA from "./data/routes_data.json";
 
 // Premium Icons
@@ -51,7 +52,20 @@ const createDynamicBusIcon = (color) => new L.divIcon({
 
 // Cache for bus icons
 const busIconCache = {};
-const getIconForBus = (busId) => {
+const getIconForBus = (busId, isEmergency) => {
+  if (isEmergency) {
+    return new L.divIcon({
+      className: "custom-bus-icon pulse-red",
+      html: `<div style="width: 24px; height: 48px; background: #E31E24; border-radius: 6px; position: relative; box-shadow: 0 0 15px rgba(227,30,36,0.8); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 0; border: 2px solid #000;">
+        <div style="width: 16px; height: 8px; background: #333; border-radius: 2px;"></div>
+        <div style="width: 24px; height: 2px; background: rgba(255,255,255,0.2);"></div>
+        <div style="width: 16px; height: 8px; background: #facc15; border-radius: 2px;"></div>
+      </div>`,
+      iconSize: [24, 48],
+      iconAnchor: [12, 24]
+    });
+  }
+
   if (!busIconCache[busId]) {
     busIconCache[busId] = createDynamicBusIcon(getBusColor(busId));
   }
@@ -70,7 +84,7 @@ function MapUpdater({ center, zoom, bounds }) {
   return null;
 }
 
-export default function MapComponent({ boardingPoint, destination, routeConfirmed, selectedBusId, buses = {} }) {
+export default function MapComponent({ boardingPoint, destination, routeConfirmed, selectedBusId, buses = {}, lang = 'en' }) {
   const [osrmRoute, setOsrmRoute] = useState([]);
   
   const mapCenter = STOPS_DATA[boardingPoint] || [17.7285, 83.2573];
@@ -165,11 +179,13 @@ export default function MapComponent({ boardingPoint, destination, routeConfirme
   return (
     <div style={{ height: "100%", width: "100%", position: "relative" }}>
       <style>{`
-        .leaflet-container { background: #e5e7eb !important; }
+        .leaflet-container { background: transparent !important; }
         .leaflet-control-attribution { display: none !important; }
-        .premium-popup .leaflet-popup-content-wrapper { border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 0; }
-        .premium-popup .leaflet-popup-content { margin: 12px 16px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: #0f172a; text-align: center; }
-        .premium-popup .leaflet-popup-tip { box-shadow: none; }
+        .premium-popup .leaflet-popup-content-wrapper { border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 0; background: var(--clean-white); color: var(--text-main); }
+        .premium-popup .leaflet-popup-content { margin: 12px 16px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; text-align: center; }
+        .premium-popup .leaflet-popup-tip { box-shadow: none; background: var(--clean-white); }
+        @keyframes redPulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        .pulse-red { animation: redPulse 1.5s infinite; }
       `}</style>
       
       <MapContainer 
@@ -181,7 +197,7 @@ export default function MapComponent({ boardingPoint, destination, routeConfirme
         <MapUpdater center={mapCenter} zoom={13} bounds={mapBounds} />
         
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          url={document.documentElement.classList.contains('dark-theme') ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" : "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"}
         />
         
         {routeConfirmed && osrmRoute.length >= 2 && (
@@ -196,21 +212,29 @@ export default function MapComponent({ boardingPoint, destination, routeConfirme
         
         {boardingPoint && STOPS_DATA[boardingPoint] && (
           <Marker position={STOPS_DATA[boardingPoint]} icon={startIcon}>
-            <Popup className="premium-popup">Pickup: {boardingPoint}</Popup>
+            <Popup className="premium-popup">{lang === 'te' ? 'పికప్' : 'Pickup'}: {lang === 'te' && STOPS_TE[boardingPoint] ? STOPS_TE[boardingPoint] : boardingPoint}</Popup>
           </Marker>
         )}
         
         {destination && STOPS_DATA[destination] && (
           <Marker position={STOPS_DATA[destination]} icon={endIcon}>
-            <Popup className="premium-popup">Drop-off: {destination}</Popup>
+            <Popup className="premium-popup">{lang === 'te' ? 'డ్రాప్-ఆఫ్' : 'Drop-off'}: {lang === 'te' && STOPS_TE[destination] ? STOPS_TE[destination] : destination}</Popup>
           </Marker>
         )}
 
         {Object.entries(buses).map(([busId, busData]) => (
-          <Marker key={busId} position={[busData.lat, busData.lng]} icon={getIconForBus(busId)}>
+          <Marker key={busId} position={[busData.lat, busData.lng]} icon={getIconForBus(busId, busData.alert)}>
             <Popup className="premium-popup">
-              Route {busData.routeId} <br/>
-              <span style={{color: getBusColor(busId), fontSize: '12px'}}>Live Location</span>
+              {lang === 'te' ? 'రూట్' : 'Route'} {busData.routeId} <br/>
+              <span style={{color: busData.alert ? '#E31E24' : getBusColor(busId), fontSize: '12px'}}>
+                {busData.alert ? (lang === 'te' ? 'భారీ ట్రాఫిక్' : 'HEAVY TRAFFIC') : (lang === 'te' ? 'లైవ్ లొకేషన్' : 'Live Location')}
+              </span>
+              <br/>
+              <span style={{ fontSize: '11px', color: '#64748b' }}>
+                {lang === 'te' ? 'రద్దీ' : 'Crowd'}: <strong style={{ color: busData.occupancy === 'Empty' ? '#10b981' : busData.occupancy === 'Full' ? '#E31E24' : '#f59e0b' }}>
+                  {busData.occupancy === 'Empty' ? (lang === 'te' ? 'ఖాళీ' : 'Empty') : busData.occupancy === 'Full' ? (lang === 'te' ? 'పూర్తి' : 'Full') : (lang === 'te' ? 'మధ్యస్థం' : 'Moderate')}
+                </strong>
+              </span>
             </Popup>
           </Marker>
         ))}

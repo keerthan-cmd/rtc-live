@@ -8,7 +8,45 @@ export default function AIChatWidget() {
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [isAiLoading, setIsAiLoading] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const messagesEndRef = useRef(null);
+
+  // Setup Speech Recognition
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recognition = SpeechRecognition ? new SpeechRecognition() : null;
+  
+  if (recognition) {
+    recognition.continuous = false;
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+  }
+
+  const toggleListen = () => {
+    if (isListening) {
+      recognition?.stop();
+      setIsListening(false);
+    } else {
+      if (recognition) {
+        recognition.start();
+        setIsListening(true);
+        recognition.onresult = (event) => {
+          const transcript = event.results[0][0].transcript;
+          setInput(transcript);
+          setIsListening(false);
+        };
+        recognition.onspeechend = () => {
+          recognition.stop();
+          setIsListening(false);
+        };
+        recognition.onerror = (event) => {
+          console.error("Speech recognition error", event.error);
+          setIsListening(false);
+        };
+      } else {
+        alert("Speech recognition is not supported in this browser.");
+      }
+    }
+  };
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -33,7 +71,7 @@ export default function AIChatWidget() {
         throw new Error('Local API not responding properly.');
       }
     } catch (err) {
-      setMessages(prev => [...prev, { text: `Error: ${err.message}. Make sure the local backend is running.`, sender: "ai" }]);
+      setMessages(prev => [...prev, { text: `Error: ${err.message}. Failed to reach the cloud server.`, sender: "ai" }]);
     }
     setIsAiLoading(false);
   };
@@ -65,7 +103,7 @@ export default function AIChatWidget() {
         throw new Error("Invalid response structure from local API");
       }
     } catch (error) {
-      setMessages(prev => [...prev, { text: `API Rejection: ${error.message}. Is your flask backend running?`, sender: "ai" }]);
+      setMessages(prev => [...prev, { text: `API Rejection: ${error.message}. Failed to reach the cloud server.`, sender: "ai" }]);
     }
     setIsTyping(false);
   };
@@ -139,7 +177,15 @@ export default function AIChatWidget() {
                 placeholder="Ask about your route..." 
                 style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: '14px', color: '#1e293b' }} 
               />
+              <button
+                onClick={toggleListen}
+                style={{ backgroundColor: isListening ? '#ef4444' : '#e2e8f0', color: isListening ? 'white' : '#475569', border: 'none', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.2s' }}
+                title="Voice Input"
+              >
+                <i className="fa-solid fa-microphone"></i>
+              </button>
               <button 
+                id="ai-send-btn"
                 onClick={handleSend} 
                 style={{ backgroundColor: '#0f172a', color: 'white', border: 'none', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'transform 0.2s' }}
                 onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}

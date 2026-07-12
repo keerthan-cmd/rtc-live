@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { HashRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import emailjs from '@emailjs/browser';
 import { database } from "./firebase"; 
@@ -10,6 +10,8 @@ import AIChatWidget from "./AIChatWidget";
 import appLogo from "./logo.png";
 import UserDashboard from "./UserDashboard";
 import DriverDashboard from "./DriverDashboard";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import L from "leaflet";
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
@@ -228,81 +230,315 @@ function UserView() {
 
 // DriverDashboard is imported from DriverDashboard.jsx
 
+const adminBusIcon = new L.divIcon({
+  className: "custom-bus-icon",
+  html: `<div style="width: 24px; height: 48px; background: #0087FF; border-radius: 6px; border: 2px solid #000; box-shadow: 0 4px 10px rgba(0,0,0,0.4);"></div>`,
+  iconSize: [24, 48],
+  iconAnchor: [12, 24]
+});
+
+const emergencyBusIcon = new L.divIcon({
+  className: "custom-bus-icon pulse-red",
+  html: `<div style="width: 24px; height: 48px; background: #E31E24; border-radius: 6px; border: 2px solid #000; box-shadow: 0 0 15px rgba(227,30,36,0.8);"></div>`,
+  iconSize: [24, 48],
+  iconAnchor: [12, 24]
+});
+
 function AdminDashboard() {
   const [activeBuses, setActiveBuses] = useState({});
+  const [activePanel, setActivePanel] = useState('fleet');
+  
+  // Settings State
+  const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
+  const [refreshRate, setRefreshRate] = useState(() => localStorage.getItem('mapRefresh') || 'Real-time');
   const navigate = useNavigate();
+  
+  const alertedBuses = useRef(new Set());
+
+  useEffect(() => {
+    if ("Notification" in window && Notification.permission !== "granted") {
+      Notification.requestPermission();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark-theme');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark-theme');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDarkMode]);
+
+  useEffect(() => {
+    localStorage.setItem('mapRefresh', refreshRate);
+  }, [refreshRate]);
 
   const handleLogout = () => {
     localStorage.removeItem("rtc_session");
     navigate("/");
   };
 
+  const handleDeleteBus = (busId) => {
+    if (window.confirm(`Are you sure you want to stop tracking Bus ${busId}?`)) {
+      set(ref(database, `buses/${busId}`), null);
+    }
+  };
+
   useEffect(() => {
-    const unsubscribe = onValue(ref(database, 'buses'), (snapshot) => { setActiveBuses(snapshot.val() || {}); });
+    const unsubscribe = onValue(ref(database, 'buses'), (snapshot) => { 
+        const data = snapshot.val() || {};
+        setActiveBuses(data); 
+        
+        // Check for new emergencies
+        Object.entries(data).forEach(([busId, bus]) => {
+            if (bus.alert === true && !alertedBuses.current.has(busId)) {
+                alertedBuses.current.add(busId);
+                if ("Notification" in window && Notification.permission === "granted") {
+                    new Notification("🚨 RTC Live Emergency Alert", {
+                        body: `Bus ${busId} (Route ${bus.routeId}) reported heavy traffic or an emergency!`,
+                        icon: '/logo.png'
+                    });
+                }
+            } else if (!bus.alert && alertedBuses.current.has(busId)) {
+                alertedBuses.current.delete(busId);
+            }
+        });
+    });
     return () => unsubscribe(); 
   }, []);
 
+  const [currentTime, setCurrentTime] = useState(Date.now());
+  useEffect(() => {
+    const interval = setInterval(() => setCurrentTime(Date.now()), 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const totalBuses = Object.keys(activeBuses).length;
+  let alertCount = 0;
+  
+  Object.values(activeBuses).forEach(bus => {
+    if ((currentTime - bus.lastUpdated > 60000) || bus.alert === true) {
+      alertCount++;
+    }
+  });
+
+  const onTimePercentage = totalBuses === 0 ? 100 : Math.round(((totalBuses - alertCount) / totalBuses) * 1000) / 10;
+  const vizagCenter = [17.6868, 83.2185];
+
   return (
-    <div style={{ backgroundColor: '#f8fafc', minHeight: '100vh', fontFamily: "'Inter', sans-serif" }}>
-      <div style={{ backgroundColor: '#ffffff', padding: '20px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0', position: 'sticky', top: 0, zIndex: 100 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          <div style={{ backgroundColor: '#10b981', color: 'white', padding: '10px', borderRadius: '12px', fontWeight: '900', fontSize: '20px' }}>RTC</div>
-          <h2 style={{ color: '#0f172a', margin: 0, fontSize: '20px', fontWeight: '800' }}>Fleet Command</h2>
-        </div>
-        <button onClick={handleLogout} style={{ background: '#f1f5f9', border: 'none', color: '#ef4444', fontWeight: 'bold', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', transition: 'background 0.2s' }}>Log Out</button>
-      </div>
-
-      <div style={{ padding: '40px', maxWidth: '1200px', margin: '0 auto' }}>
+    <div className="app-wrapper">
+      <style>{`
+        :root {
+            --rtc-red: #E31E24;
+            --rtc-black: #141414;
+            --clean-white: #FFFFFF;
+            --off-white: #F8F9FA;
+            --border-color: #EBEBEB;
+            --text-main: #2D3436;
+            --text-muted: #7F8C8D;
+        }
         
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px', marginBottom: '40px' }}>
-          <div style={{ backgroundColor: '#1e293b', padding: '30px', borderRadius: '20px', color: 'white', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', position: 'relative', overflow: 'hidden' }}>
-            <h1 style={{ fontSize: '56px', margin: '0', color: '#10b981', lineHeight: '1' }}>{Object.keys(activeBuses).length}</h1>
-            <p style={{ margin: '10px 0 0 0', fontWeight: '600', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '1px' }}>Active Vehicles</p>
-            <div style={{ position: 'absolute', right: '-20px', bottom: '-20px', fontSize: '100px', opacity: '0.1' }}>🚌</div>
-          </div>
-          
-          <div style={{ backgroundColor: '#ffffff', padding: '30px', borderRadius: '20px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
-            <h1 style={{ fontSize: '40px', margin: '0', color: '#0f172a', lineHeight: '1' }}>98.2%</h1>
-            <p style={{ margin: '10px 0 0 0', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px' }}>On-Time Performance</p>
-          </div>
-          
-          <div style={{ backgroundColor: '#ffffff', padding: '30px', borderRadius: '20px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
-             <h1 style={{ fontSize: '40px', margin: '0', color: '#ef4444', lineHeight: '1' }}>0</h1>
-             <p style={{ margin: '10px 0 0 0', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px' }}>Active Alerts</p>
-          </div>
+        :root.dark-theme {
+            --rtc-red: #FF4757;
+            --rtc-black: #0F172A;
+            --clean-white: #1E293B;
+            --off-white: #0F172A;
+            --border-color: #334155;
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { margin: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        .app-wrapper { display: flex; width: 100vw; height: 100vh; color: var(--text-main); overflow: hidden; background: var(--off-white); }
+        
+        .sidebar-container { display: flex; width: 480px; height: 100%; background: var(--clean-white); border-right: 1px solid var(--border-color); z-index: 10; box-shadow: 4px 0 25px rgba(0,0,0,0.05); }
+        .main-sidebar { width: 90px; height: 100%; background: var(--rtc-black); display: flex; flex-direction: column; align-items: center; padding: 20px 0; }
+        
+        .brand h2 { color: var(--clean-white); font-size: 1.4rem; font-weight: 800; text-align: center; }
+        .brand span { color: #0087FF; font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; display: block; text-align: center; }
+        
+        .nav-menu { margin-top: 50px; display: flex; flex-direction: column; gap: 20px; width: 100%; }
+        .nav-btn { background: transparent; border: none; color: var(--text-muted); padding: 15px 0; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; transition: all 0.3s ease; }
+        .nav-btn i { font-size: 20px; }
+        .nav-btn span { font-size: 0.7rem; font-weight: 600; }
+        .nav-btn:hover, .nav-btn.active { color: var(--clean-white); background: rgba(255, 255, 255, 0.05); border-left: 4px solid #0087FF; }
+        
+        .slide-panels { flex: 1; padding: 30px 20px; background: var(--clean-white); overflow-y: auto; }
+        .panel-content { display: none; }
+        .panel-content.active { display: block; animation: fadeIn 0.4s ease; }
+        .panel-content h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 5px; }
+        .panel-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px; line-height: 1.4; }
+        
+        .metric-card { background: var(--off-white); border: 1px solid var(--border-color); border-radius: 10px; padding: 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .metric-card.alert { background: #FFF5F5; border-color: #FEB2B2; color: #C53030; }
+        .metric-card h1 { font-size: 2rem; margin: 0; color: #0087FF; }
+        .metric-card.alert h1 { color: #E31E24; }
+        .metric-card p { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin: 0; }
+        
+        .slide-card-item { background: var(--clean-white); border: 1px solid var(--border-color); border-radius: 10px; padding: 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; transition: all 0.2s ease; }
+        .card-meta h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 4px; }
+        .card-meta p { font-size: 0.8rem; color: var(--text-muted); }
+        
+        .fullscreen-map { flex: 1; height: 100%; z-index: 1; position: relative; }
+        
+        .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid var(--border-color); }
+        .settings-row h4 { font-size: 1rem; margin-bottom: 5px; }
+        .settings-row p { font-size: 0.8rem; color: var(--text-muted); }
+        
+        .toggle-switch { position: relative; width: 50px; height: 26px; display: inline-block; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border-color); transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #10b981; }
+        input:checked + .slider:before { transform: translateX(24px); }
+        
+        .modern-select { padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--off-white); color: var(--text-main); outline: none; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(-5px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes redPulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        .pulse-red { animation: redPulse 1.5s infinite; }
+        
+        @media (max-width: 768px) {
+            .app-wrapper { flex-direction: column-reverse; }
+            .sidebar-container { width: 100%; height: 50vh; flex-direction: column; }
+            .main-sidebar { width: 100%; height: auto; flex-direction: row; padding: 10px; justify-content: space-around; }
+            .nav-menu { flex-direction: row; margin-top: 0; justify-content: space-around; gap: 5px; }
+            .nav-btn { padding: 10px; }
+            .nav-btn i { font-size: 18px; }
+            .nav-btn span { font-size: 0.6rem; }
+            .nav-btn:hover, .nav-btn.active { border-left: none; border-bottom: 4px solid var(--rtc-red); }
+            .fullscreen-map { height: 50vh; }
+            .slide-panels { padding: 15px; }
+        }
+      `}</style>
+
+      <aside className="sidebar-container">
+        <div className="main-sidebar">
+          <div className="brand"><h2>RTC</h2><span>ADMIN</span></div>
+          <nav className="nav-menu">
+            <button className={`nav-btn ${activePanel === 'fleet' ? 'active' : ''}`} onClick={() => setActivePanel('fleet')}>
+              <i className="fa-solid fa-server"></i><span>Fleet</span>
+            </button>
+            <button className={`nav-btn ${activePanel === 'settings' ? 'active' : ''}`} onClick={() => setActivePanel('settings')}>
+              <i className="fa-solid fa-cog"></i><span>Settings</span>
+            </button>
+            <button className="nav-btn" onClick={handleLogout}>
+              <i className="fa-solid fa-sign-out-alt"></i><span>Logout</span>
+            </button>
+          </nav>
         </div>
 
-        <div style={{ backgroundColor: 'white', padding: '30px', borderRadius: '20px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '2px solid #f1f5f9', paddingBottom: '15px' }}>
-             <h3 style={{ margin: 0, fontSize: '20px', color: '#0f172a' }}>Live Roster</h3>
-             <span style={{ backgroundColor: '#ecfdf5', color: '#059669', padding: '6px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 'bold' }}>Auto-updating</span>
+        <div className="slide-panels">
+          <div className={`panel-content ${activePanel === 'fleet' ? 'active' : ''}`}>
+             <h2>Fleet Command</h2>
+             <p className="panel-desc">Real-time overview of the entire transit network.</p>
+             
+             <div className="metric-card">
+                 <div>
+                    <h1>{totalBuses}</h1>
+                    <p style={{color: 'var(--text-muted)'}}>Active Vehicles</p>
+                 </div>
+                 <i className="fa-solid fa-bus" style={{fontSize: '2rem', opacity: 0.2}}></i>
+             </div>
+
+             <div className="metric-card">
+                 <div>
+                    <h1>{onTimePercentage}%</h1>
+                    <p style={{color: 'var(--text-muted)'}}>On-Time Perf</p>
+                 </div>
+                 <i className="fa-solid fa-check-circle" style={{fontSize: '2rem', opacity: 0.2}}></i>
+             </div>
+
+             <div className={`metric-card ${alertCount > 0 ? 'alert' : ''}`}>
+                 <div>
+                    <h1 style={{color: alertCount > 0 ? '#E31E24' : '#10b981'}}>{alertCount}</h1>
+                    <p style={{color: alertCount > 0 ? '#E31E24' : 'var(--text-muted)'}}>Active Alerts</p>
+                 </div>
+                 <i className="fa-solid fa-triangle-exclamation" style={{fontSize: '2rem', opacity: 0.2}}></i>
+             </div>
+
+             <h3 style={{ marginTop: '20px', marginBottom: '10px', fontSize: '1.1rem' }}>Live Roster</h3>
+             
+             <div className="results-list">
+               {Object.keys(activeBuses).length === 0 ? (
+                 <p className="panel-desc" style={{textAlign: 'center', marginTop: '20px'}}>No vehicles currently on route.</p>
+               ) : (
+                  Object.entries(activeBuses).map(([bus, data]) => {
+                    const isSignalLost = currentTime - data.lastUpdated > 60000;
+                    const isAlert = data.alert === true;
+                    const hasIssue = isSignalLost || isAlert;
+                    
+                    return (
+                      <div key={bus} className="slide-card-item" style={{ borderLeft: `4px solid ${hasIssue ? 'var(--rtc-red)' : '#10b981'}` }}>
+                         <div className="card-meta">
+                             <h4>Route {data.routeId || 'Unknown'}</h4>
+                             <p>Bus ID: {bus}</p>
+                             <p style={{color: hasIssue ? 'var(--rtc-red)' : '#10b981', fontWeight: 'bold'}}>
+                                {isAlert ? 'EMERGENCY / TRAFFIC' : (isSignalLost ? 'Signal Lost (Delayed)' : (data.status || 'Active'))}
+                             </p>
+                        </div>
+                        <button 
+                          onClick={() => handleDeleteBus(bus)} 
+                          style={{background: 'rgba(227, 30, 36, 0.1)', color: 'var(--rtc-red)', border: 'none', padding: '10px', borderRadius: '8px', cursor: 'pointer', transition: '0.2s'}}
+                          title="Remove Bus"
+                        >
+                          <i className="fa-solid fa-trash"></i>
+                        </button>
+                     </div>
+                   );
+                 })
+               )}
+             </div>
           </div>
           
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {Object.keys(activeBuses).length === 0 ? (
-               <div style={{ padding: '40px', textAlign: 'center', color: '#94a3b8', backgroundColor: '#f8fafc', borderRadius: '12px' }}>
-                 <div style={{ fontSize: '40px', marginBottom: '10px' }}>😴</div>
-                 No vehicles currently on route.
+          <div className={`panel-content ${activePanel === 'settings' ? 'active' : ''}`}>
+             <h2>System Settings</h2>
+             <p className="panel-desc">Configure dashboard preferences.</p>
+             
+             <div className="settings-row">
+               <div>
+                 <h4>Dark Mode</h4>
+                 <p>Switch to a dark color scheme.</p>
                </div>
-            ) : null}
-            {Object.entries(activeBuses).map(([bus, data]) => (
-              <div key={bus} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', backgroundColor: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                 <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                    <div style={{ width: '40px', height: '40px', backgroundColor: '#e0e7ff', color: '#4f46e5', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>{bus.substring(0,2)}</div>
-                    <div>
-                       <div style={{ fontWeight: '800', color: '#0f172a', fontSize: '16px' }}>Route {bus}</div>
-                       <div style={{ fontSize: '12px', color: '#64748b' }}>Lat: {data.lat.toFixed(4)}, Lng: {data.lng.toFixed(4)}</div>
-                    </div>
-                 </div>
-                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ width: '8px', height: '8px', backgroundColor: '#10b981', borderRadius: '50%', display: 'inline-block' }}></span>
-                    <span style={{ color: '#10b981', fontWeight: 'bold', fontSize: '14px' }}>{data.status || 'Active'}</span>
-                 </div>
-              </div>
-            ))}
+               <label className="toggle-switch">
+                 <input type="checkbox" checked={isDarkMode} onChange={(e) => setIsDarkMode(e.target.checked)} />
+                 <span className="slider"></span>
+               </label>
+             </div>
+             
+             <div className="settings-row">
+               <div>
+                 <h4>Telemetry Refresh</h4>
+                 <p>Visual map polling interval.</p>
+               </div>
+               <select className="modern-select" value={refreshRate} onChange={(e) => setRefreshRate(e.target.value)}>
+                 <option>Real-time</option>
+                 <option>5 Seconds</option>
+                 <option>10 Seconds</option>
+               </select>
+             </div>
+             
           </div>
         </div>
-      </div>
+      </aside>
+
+      <main className="fullscreen-map">
+        <MapContainer center={vizagCenter} zoom={13} style={{ width: '100%', height: '100%' }} zoomControl={true}>
+          <TileLayer url={isDarkMode ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"} />
+          {Object.entries(activeBuses).map(([bus, data]) => (
+            <Marker key={bus} position={[data.lat, data.lng]} icon={data.alert ? emergencyBusIcon : adminBusIcon}>
+              <Popup>
+                <strong>Route {data.routeId}</strong><br/>
+                Bus: {bus}<br/>
+                Status: {data.alert ? 'EMERGENCY' : (currentTime - data.lastUpdated > 60000 ? 'Delayed' : 'Active')}
+              </Popup>
+            </Marker>
+          ))}
+        </MapContainer>
+      </main>
     </div>
   );
 }

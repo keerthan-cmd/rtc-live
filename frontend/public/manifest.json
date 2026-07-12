@@ -1,0 +1,21 @@
+{
+  "name": "RTC Live Vizag",
+  "short_name": "RTC Live",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "description": "Real-time bus tracking and smart scheduling for Visakhapatnam RTC.",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

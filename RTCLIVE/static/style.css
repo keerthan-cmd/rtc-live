@@ -1,0 +1,405 @@
+:root {
+    --rtc-red: #E31E24;
+    --rtc-black: #141414;
+    --clean-white: #FFFFFF;
+    --off-white: #F8F9FA;
+    --border-color: #EBEBEB;
+    --text-main: #2D3436;
+    --text-muted: #7F8C8D;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body, html {
+    height: 100%;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text-main);
+    overflow: hidden;
+}
+
+.app-wrapper {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* Vertical Core Sidebar styling */
+.sidebar-container {
+    display: flex;
+    width: 480px;
+    height: 100%;
+    background: var(--clean-white);
+    border-right: 1px solid var(--border-color);
+    z-index: 10;
+    box-shadow: 4px 0 25px rgba(0,0,0,0.05);
+}
+
+.main-sidebar {
+    width: 90px;
+    height: 100%;
+    background: var(--rtc-black);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+}
+
+.brand h2 {
+    color: var(--clean-white);
+    font-size: 1.4rem;
+    font-weight: 800;
+    text-align: center;
+}
+
+.brand span {
+    color: var(--rtc-red);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    display: block;
+    text-align: center;
+}
+
+.nav-menu {
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+}
+
+.nav-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    padding: 15px 0;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+.nav-btn i {
+    font-size: 20px;
+}
+
+.nav-btn span {
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.nav-btn:hover, .nav-btn.active {
+    color: var(--clean-white);
+    background: rgba(255, 255, 255, 0.05);
+    border-left: 4px solid var(--rtc-red);
+}
+
+/* Slide Content Panels container styling */
+.slide-panels {
+    flex: 1;
+    padding: 30px 20px;
+    background: var(--clean-white);
+    overflow-y: auto;
+}
+
+.panel-content {
+    display: none;
+}
+
+.panel-content.active {
+    display: block;
+    animation: fadeIn 0.4s ease;
+}
+
+.panel-content h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.panel-desc {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 15px;
+    line-height: 1.4;
+}
+
+/* Transport Mode Buttons */
+.transport-modes {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.mode-btn {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--clean-white);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 0.8rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    color: var(--text-main);
+}
+
+.mode-btn.active {
+    background: var(--rtc-black);
+    color: var(--clean-white);
+    border-color: var(--rtc-black);
+}
+
+/* Input Fields & Component Structuring */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.input-group input, .search-box-row input {
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--off-white);
+    font-size: 0.95rem;
+    outline: none;
+    transition: border 0.2s;
+}
+
+.input-group input:focus, .search-box-row input:focus {
+    border-color: var(--rtc-red);
+}
+
+.search-box-row {
+    display: flex;
+    gap: 8px;
+}
+
+.search-box-row input { flex: 1; }
+
+.search-box-row button {
+    background: var(--rtc-red);
+    color: var(--clean-white);
+    border: none;
+    padding: 0 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.search-box-row button:hover {
+    background: #c0191e;
+}
+
+.action-btn {
+    width: 100%;
+    background: var(--rtc-black);
+    color: var(--clean-white);
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+    margin-top: 5px;
+}
+
+.action-btn:hover {
+    background: var(--rtc-red);
+}
+
+/* Interactive Dynamic Cards UI */
+.results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.slide-card-item {
+    background: var(--clean-white);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+.slide-card-item:hover {
+    border-color: var(--rtc-red);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    transform: translateX(3px);
+}
+
+.card-meta h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 4px; }
+.card-meta p { font-size: 0.8rem; color: var(--text-muted); }
+
+.badge-eta {
+    background: rgba(227, 30, 36, 0.08);
+    color: var(--rtc-red);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.gps-alert-box {
+    padding: 15px;
+    border-radius: 8px;
+    background: #FFF5F5;
+    border: 1px solid #FEB2B2;
+    color: #C53030;
+    font-size: 0.85rem;
+    margin-bottom: 15px;
+}
+
+/* "Where is my train" Vertical Timeline Styles */
+.route-timeline {
+    position: relative;
+    padding-left: 25px;
+    margin-top: 20px;
+}
+
+.route-timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 5px;
+    bottom: 5px;
+    width: 4px;
+    background: var(--border-color);
+    border-radius: 2px;
+}
+
+.timeline-stop {
+    position: relative;
+    margin-bottom: 25px;
+}
+
+.timeline-stop::before {
+    content: '';
+    position: absolute;
+    left: -25px;
+    top: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--clean-white);
+    border: 4px solid var(--border-color);
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+.timeline-stop.active-stop::before {
+    border-color: var(--rtc-red);
+    background: var(--rtc-red);
+    box-shadow: 0 0 0 4px rgba(227, 30, 36, 0.2);
+}
+
+.timeline-stop h4 { 
+    font-size: 0.95rem; 
+    margin-bottom: 3px; 
+    color: var(--text-main);
+}
+
+/* Fullscreen Map Styles */
+.fullscreen-map {
+    flex: 1;
+    height: 100%;
+    z-index: 1;
+}
+
+/* Fix for custom Leaflet icons */
+.custom-icon {
+    background: transparent;
+    border: none;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateX(-5px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+/* Modern Select Input for Routes */
+.modern-select {
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--off-white);
+    font-size: 0.95rem;
+    outline: none;
+    cursor: pointer;
+    appearance: none; /* Removes default browser styling */
+}
+
+/* Smart Crowdness Visualization */
+.telemetry-dashboard {
+    background: var(--off-white);
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 12px;
+}
+.crowd-meter-bg {
+    width: 100%;
+    height: 8px;
+    background: #E0E0E0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.crowd-meter-fill {
+    height: 100%;
+    transition: width 0.5s ease-in-out;
+}
+.smart-advice-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #FFF5F5;
+    border-left: 4px solid var(--rtc-red);
+    padding: 12px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+/* Premium Favorites Cards */
+.fav-card {
+    cursor: pointer;
+    border: none;
+    background: #FAFAFA;
+    margin-bottom: 12px;
+}
+.fav-card:hover {
+    background: #FFF;
+    border: 1px solid var(--border-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+.fav-icon-box {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+}

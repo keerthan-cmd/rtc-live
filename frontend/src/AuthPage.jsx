@@ -5,6 +5,7 @@ export default function AuthPage({ requestedView, onLogin, onSignUp, onForgotPas
   const [role, setRole] = useState('User');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (requestedView) setMode(requestedView);
@@ -43,30 +44,24 @@ export default function AuthPage({ requestedView, onLogin, onSignUp, onForgotPas
       alignItems: "center",
       minHeight: "100vh",
       margin: 0,
-      width: "100vw"
+      width: "100vw",
+      padding: "20px",
+      boxSizing: "border-box"
     }}>
       <style>{`
-        .phone-frame {
-            width: 100%;
-            max-width: 480px;
-            min-height: 100vh;
-            background-color: transparent; 
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .app-screen-custom {
-            width: 100%;
+        .app-screen {
+            flex: 1;
             padding: 20px; 
             display: flex;
             flex-direction: column;
             justify-content: center; 
             align-items: center;
+            width: 100%;
+            max-width: 420px;
+            margin: auto;
         }
 
-        .app-title-custom {
+        .app-title {
             color: #0f172a;
             font-size: 28px;
             font-weight: 900;
@@ -85,7 +80,7 @@ export default function AuthPage({ requestedView, onLogin, onSignUp, onForgotPas
             margin-bottom: 20px; 
         }
 
-        .bus-destination-led {
+        .bus-destination {
             position: absolute;
             top: 12px;
             left: 50%;
@@ -100,7 +95,7 @@ export default function AuthPage({ requestedView, onLogin, onSignUp, onForgotPas
             border: 2px solid #334155; 
         }
 
-        .divider-line-custom {
+        .divider-line {
             width: 80%;
             height: 1.5px;
             background: linear-gradient(90deg, transparent, #64748b, transparent);
@@ -108,7 +103,7 @@ export default function AuthPage({ requestedView, onLogin, onSignUp, onForgotPas
             opacity: 0.6;
         }
 
-        .wheel-custom {
+        .wheel {
             position: absolute;
             bottom: -24px; 
             width: 42px; 
@@ -116,10 +111,10 @@ export default function AuthPage({ requestedView, onLogin, onSignUp, onForgotPas
             background-color: #0f172a;
             border-radius: 6px;
         }
-        .left-wheel-custom { left: 20px; }
-        .right-wheel-custom { right: 20px; }
+        .left-wheel { left: 20px; }
+        .right-wheel { right: 20px; }
 
-        .btn-group-custom {
+        .toggle-group, .role-group {
             display: flex;
             background: #f1f5f9;
             border-radius: 10px;
@@ -128,7 +123,7 @@ export default function AuthPage({ requestedView, onLogin, onSignUp, onForgotPas
             gap: 4px; 
         }
 
-        .btn-group-custom button {
+        .toggle-group button, .role-group button {
             flex: 1;
             padding: 8px;
             border: 2px solid transparent; 
@@ -141,13 +136,13 @@ export default function AuthPage({ requestedView, onLogin, onSignUp, onForgotPas
             transition: all 0.2s ease-in-out;
         }
 
-        .btn-group-custom button.active {
+        .toggle-group button.active, .role-group button.active {
             border: 2px solid #3b82f6; 
             color: #3b82f6; 
             background: #ffffff; 
         }
 
-        .instruction-text-custom {
+        .instruction-text {
             text-align: center;
             font-size: 12px;
             color: #475569; 
@@ -155,23 +150,42 @@ export default function AuthPage({ requestedView, onLogin, onSignUp, onForgotPas
             font-weight: 600;
         }
 
+        .input-group {
+            position: relative;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
         .input-custom {
             width: 100%;
             padding: 12px;
-            margin-bottom: 15px;
             border: 1px solid #cbd5e1;
             border-radius: 10px;
             box-sizing: border-box;
             font-size: 14px;
             background-color: #f8fafc;
+            color: #0f172a;
         }
         .input-custom:focus {
             outline: none;
             border-color: #3b82f6;
             background-color: #ffffff;
         }
+        
+        .show-pass-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+        }
 
-        .main-btn-custom {
+        .main-btn {
             width: 100%;
             padding: 14px;
             background: #10b981; 
@@ -184,9 +198,9 @@ export default function AuthPage({ requestedView, onLogin, onSignUp, onForgotPas
             margin-top: 5px;
             transition: background 0.2s;
         }
-        .main-btn-custom:hover { background: #059669; }
+        .main-btn:hover { background: #059669; }
         
-        .bumper-area-custom {
+        .bumper-area {
             display: flex;
             justify-content: center;
             align-items: center;
@@ -194,7 +208,7 @@ export default function AuthPage({ requestedView, onLogin, onSignUp, onForgotPas
             margin-top: 25px;
         }
 
-        .headlight-custom {
+        .headlight {
             width: 18px;
             height: 18px;
             background-color: #fef08a; 
@@ -203,7 +217,7 @@ export default function AuthPage({ requestedView, onLogin, onSignUp, onForgotPas
             box-shadow: 0 0 10px rgba(253, 224, 71, 0.7); 
         }
 
-        .forgot-link-custom {
+        .forgot-link {
             background-color: #facc15; 
             color: #000000; 
             text-decoration: none;
@@ -217,87 +231,97 @@ export default function AuthPage({ requestedView, onLogin, onSignUp, onForgotPas
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             transition: background 0.2s;
         }
-        .forgot-link-custom:hover {
+        .forgot-link:hover {
             background-color: #eab308;
         }
       `}</style>
 
-      <div className="phone-frame">
-          <div className="app-screen-custom">
-              <div className="app-title-custom">RTC LIVE</div>
+          <div className="app-screen">
+              <div className="app-title">RTC LIVE</div>
 
               <div className="bus-card">
                   
-                  <div className="bus-destination-led">RTC VIZAG</div>
+                  <div className="bus-destination">RTC VIZAG</div>
                   
-                  <div className="wheel-custom left-wheel-custom"></div>
-                  <div className="wheel-custom right-wheel-custom"></div>
+                  <div className="wheel left-wheel"></div>
+                  <div className="wheel right-wheel"></div>
 
-                  <div className="divider-line-custom"></div>
+                  <div className="divider-line"></div>
 
-                  <div className="btn-group-custom">
-                      <button className={mode === 'login' ? 'active' : ''} onClick={() => setMode('login')}>Login</button>
-                      <button className={mode === 'signup' ? 'active' : ''} onClick={() => setMode('signup')}>Sign Up</button>
+                  <div className="toggle-group">
+                      <button type="button" className={mode === 'login' ? 'active' : ''} onClick={() => setMode('login')}>Login</button>
+                      <button type="button" className={mode === 'signup' ? 'active' : ''} onClick={() => setMode('signup')}>Sign Up</button>
                   </div>
 
-                  <div className="btn-group-custom">
-                      <button className={role === 'User' ? 'active' : ''} onClick={() => setRole('User')}>User</button>
-                      <button className={role === 'Driver' ? 'active' : ''} onClick={() => setRole('Driver')}>Driver</button>
-                      <button className={role === 'Admin' ? 'active' : ''} onClick={() => setRole('Admin')}>Admin</button>
+                  <div className="role-group">
+                      <button type="button" className={role === 'User' ? 'active' : ''} onClick={() => setRole('User')}>User</button>
+                      <button type="button" className={role === 'Driver' ? 'active' : ''} onClick={() => setRole('Driver')}>Driver</button>
+                      <button type="button" className={role === 'Admin' ? 'active' : ''} onClick={() => setRole('Admin')}>Admin</button>
                   </div>
 
-                  <div className="instruction-text-custom">
+                  <div className="instruction-text">
                       {mode === 'login' ? 'Enter email and password to login' : 
                        mode === 'signup' ? 'Enter email and create password to sign up' : 
                        'Enter email to receive a secure OTP'}
                   </div>
 
                   <form onSubmit={handleAction}>
-                      <input 
-                          type="email" 
-                          className="input-custom" 
-                          placeholder="Email" 
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          required 
-                      />
-                      
-                      {mode !== 'forgot' && (
+                      <div className="input-group">
                           <input 
-                              type="password" 
+                              type="email" 
                               className="input-custom" 
-                              placeholder={mode === 'login' ? 'Password' : 'Create Password'} 
-                              value={password}
-                              onChange={(e) => setPassword(e.target.value)}
+                              placeholder="Email" 
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
                               required 
                           />
+                      </div>
+                      
+                      {mode !== 'forgot' && (
+                          <div className="input-group">
+                              <input 
+                                  type={showPassword ? "text" : "password"} 
+                                  className="input-custom" 
+                                  placeholder={mode === 'login' ? 'Password' : 'Create Password'} 
+                                  value={password}
+                                  onChange={(e) => setPassword(e.target.value)}
+                                  required 
+                                  style={{ paddingRight: '50px' }}
+                              />
+                              <button 
+                                  type="button" 
+                                  className="show-pass-btn" 
+                                  onClick={() => setShowPassword(!showPassword)}
+                              >
+                                  {showPassword ? "HIDE" : "SHOW"}
+                              </button>
+                          </div>
                       )}
                       
-                      <button type="submit" className="main-btn-custom">
-                          {mode === 'login' ? 'Send OTP' : 
+                      <button type="submit" className="main-btn">
+                          {mode === 'login' ? 'Login' : 
                            mode === 'signup' ? 'Create Account' : 
                            'Send Reset Link'}
                       </button>
                       
-                      <div className="bumper-area-custom">
-                          <div className="headlight-custom"></div>
+                      <div className="bumper-area">
+                          <div className="headlight"></div>
                           {mode === 'login' && (
-                              <a href="#" className="forgot-link-custom" onClick={(e) => { e.preventDefault(); setMode('forgot'); }}>
+                              <a href="#" className="forgot-link" onClick={(e) => { e.preventDefault(); setMode('forgot'); }}>
                                   Forgot Password?
                               </a>
                           )}
                           {mode === 'forgot' && (
-                              <a href="#" className="forgot-link-custom" onClick={(e) => { e.preventDefault(); setMode('login'); }}>
+                              <a href="#" className="forgot-link" onClick={(e) => { e.preventDefault(); setMode('login'); }}>
                                   Back to Login
                               </a>
                           )}
-                          <div className="headlight-custom"></div>
+                          <div className="headlight"></div>
                       </div>
                   </form>
 
               </div>
           </div>
-      </div>
     </div>
   );
 }
