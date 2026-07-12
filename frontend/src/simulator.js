@@ -1,15 +1,5 @@
 import { database, ref, set } from './firebase.js';
-
-const routePath = [
-  [17.6896, 83.2086], // Gajuwaka
-  [17.7011, 83.2154], // Sheela Nagar
-  [17.7126, 83.2268], // BHPV
-  [17.7215, 83.2421], // Airport Rd
-  [17.7285, 83.2573], // NAD
-  [17.7342, 83.2751], // Kancharapalem
-  [17.7261, 83.3042], // Maddilapalem
-  [17.7111, 83.3197]  // RTC Complex
-];
+import { ROUTES } from './routes.js';
 
 // Interpolate between points to make smooth movement
 function getInterpolatedPoint(p1, p2, fraction) {
@@ -20,15 +10,17 @@ function getInterpolatedPoint(p1, p2, fraction) {
 }
 
 const buses = [
-  { id: '38Y', segment: 0, fraction: 0, speed: 0.05, dir: 1 },
-  { id: '400K', segment: 2, fraction: 0.5, speed: 0.04, dir: -1 },
-  { id: '28Z', segment: 1, fraction: 0.2, speed: 0.06, dir: 1 }
+  { id: '38Y', routeId: '38Y', segment: 0, fraction: 0, speed: 0.05, dir: 1 },
+  { id: '400K', routeId: '400K', segment: 2, fraction: 0.5, speed: 0.04, dir: -1 },
+  { id: '28Z', routeId: '28Z', segment: 1, fraction: 0.2, speed: 0.06, dir: 1 }
 ];
 
 console.log("Starting RTC Live Simulator...");
 
 setInterval(() => {
   buses.forEach(bus => {
+    const routePath = ROUTES[bus.routeId];
+    
     // Update fraction
     bus.fraction += bus.speed * bus.dir;
 

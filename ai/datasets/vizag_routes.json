@@ -1,0 +1,54 @@
+{
+  "routes": [
+    {
+      "id": "38Y",
+      "name": "Gajuwaka to RTC Complex",
+      "stops": ["Gajuwaka", "Sheela Nagar", "BHPV", "Airport Rd", "NAD", "Kancharapalem", "Maddilapalem", "RTC Complex"],
+      "frequency_mins": 15,
+      "first_bus": "05:30 AM",
+      "last_bus": "09:30 PM",
+      "fare_range": "₹15 - ₹35"
+    },
+    {
+      "id": "400K",
+      "name": "NAD to RTC Complex (via Siripuram)",
+      "stops": ["NAD", "RTO", "Seethammadhara", "Siripuram", "RTC Complex"],
+      "frequency_mins": 20,
+      "first_bus": "06:00 AM",
+      "last_bus": "10:00 PM",
+      "fare_range": "₹10 - ₹25"
+    },
+    {
+      "id": "28Z",
+      "name": "Scindia to RTC Complex",
+      "stops": ["Scindia", "Malkapuram", "Naval Dockyard", "Convent Jct", "RTC Complex"],
+      "frequency_mins": 30,
+      "first_bus": "06:15 AM",
+      "last_bus": "08:45 PM",
+      "fare_range": "₹15 - ₹30"
+    },
+    {
+      "id": "900K",
+      "name": "Kurmannapalem to Bheemili",
+      "stops": ["Kurmannapalem", "Gajuwaka", "NAD", "RTC Complex", "Maddilapalem", "MVP Colony", "Sagar Nagar", "Bheemili"],
+      "frequency_mins": 45,
+      "first_bus": "05:00 AM",
+      "last_bus": "08:00 PM",
+      "fare_range": "₹20 - ₹60"
+    },
+    {
+      "id": "500",
+      "name": "Anakapalle to RTC Complex",
+      "stops": ["Anakapalle", "Lankelapalem", "Kurmannapalem", "Gajuwaka", "NAD", "RTC Complex"],
+      "frequency_mins": 15,
+      "first_bus": "04:30 AM",
+      "last_bus": "10:30 PM",
+      "fare_range": "₹30 - ₹50"
+    }
+  ],
+  "bot_responses": {
+    "greeting": "Hello! I am your local offline AI Transit Assistant for Vizag. How can I help you today?",
+    "help": "You can ask me about routes (e.g., 'What bus goes to NAD?'), timings ('When is the first bus for 38Y?'), or fares.",
+    "fallback": "I'm sorry, I couldn't understand that. Try asking about a specific route, stop, or say 'help'."
+  }
+}

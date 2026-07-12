@@ -109,57 +109,6 @@ export function RouteSchedules({ onBack }) {
   );
 }
 
-export function MyPasses({ onBack }) {
-  const [isBuying, setIsBuying] = useState(false);
-  const [passActive, setPassActive] = useState(true);
-
-  const handleBuyPass = () => {
-    setIsBuying(true);
-    setTimeout(() => {
-      setIsBuying(false);
-      alert("Success! Your pass has been renewed.");
-      setPassActive(true);
-    }, 1500);
-  };
-
-  return (
-    <div className="container slide-up">
-      <div className="screen-header">
-        <i className="fas fa-arrow-left" onClick={onBack}></i>
-        <h2>My Passes</h2>
-      </div>
-      
-      <div className="pass-container">
-        <div className="digital-pass" style={{ opacity: passActive ? 1 : 0.6 }}>
-          <div className="pass-header">
-            <h3>Monthly Commuter</h3>
-            {passActive ? <span className="badge-success" style={{background: 'white', color: 'black'}}>Active</span> : <span className="badge-success" style={{background: '#ef4444'}}>Expired</span>}
-          </div>
-          <div className="pass-body">
-            <div className="qr-placeholder">
-              <i className="fas fa-qrcode"></i>
-            </div>
-            <div className="pass-details">
-              <p className="text-sm text-muted">Valid until</p>
-              <h4>Aug 31, 2026</h4>
-              <p className="text-sm text-muted mt-2">Pass ID</p>
-              <p className="font-mono">RTC-992-8411</p>
-            </div>
-          </div>
-          <div className="pass-footer">
-            <span>City Wide Coverage</span>
-            <i className="fas fa-check-circle"></i>
-          </div>
-        </div>
-      </div>
-
-      <button className="btn-primary mt-4 w-full" onClick={handleBuyPass} disabled={isBuying}>
-        {isBuying ? <><i className="fas fa-spinner fa-spin"></i> Processing...</> : <><i className="fas fa-shopping-cart"></i> Buy New Pass</>}
-      </button>
-    </div>
-  );
-}
-
 export function Settings({ onBack, userEmail, theme, toggleTheme }) {
   const [notifications, setNotifications] = useState(true);
 
