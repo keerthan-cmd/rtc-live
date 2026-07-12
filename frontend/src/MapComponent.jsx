@@ -2,15 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { database, ref, onValue } from "./firebase";
-
-// Coordinates for stops
-const STOPS = {
-  "Gajuwaka": [17.6896, 83.2086],
-  "NAD": [17.7285, 83.2573],
-  "RTC Complex": [17.7111, 83.3197],
-  "Maddilapalem": [17.7261, 83.3042],
-};
+import STOPS_DATA from "./data/stops.json";
+import ROUTES_DATA from "./data/routes_data.json";
 
 // Premium Icons
 const createDotIcon = (color) => new L.divIcon({
@@ -20,21 +13,33 @@ const createDotIcon = (color) => new L.divIcon({
   iconAnchor: [8, 8]
 });
 
-const createSquareIcon = (color) => new L.divIcon({
-  className: "custom-square-icon",
-  html: `<div style="width: 16px; height: 16px; background-color: ${color}; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"></div>`,
-  iconSize: [16, 16],
-  iconAnchor: [8, 8]
+const createPinIcon = (color) => new L.divIcon({
+  className: "custom-pin-icon",
+  html: `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="32" height="42" style="filter: drop-shadow(0px 4px 4px rgba(0,0,0,0.3));">
+      <path fill="${color}" d="M215.7 499.2C267 435 384 279.4 384 192C384 86 298 0 192 0S0 86 0 192c0 87.4 117 243 168.3 307.2c12.3 15.3 35.1 15.3 47.4 0zM192 128a64 64 0 1 1 0 128 64 64 0 1 1 0-128z"/>
+    </svg>
+  `,
+  iconSize: [32, 42],
+  iconAnchor: [16, 42]
 });
 
 const startIcon = createDotIcon('#10b981');
-const endIcon = createSquareIcon('#000000');
+const endIcon = createPinIcon('#ea4335');
 
-// Top-down Bus Icon
-const busIcon = new L.divIcon({
+// Dynamic Color generator for buses
+const getBusColor = (busId) => {
+  const colors = ['#f43f5e', '#a855f7', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4'];
+  let hash = 0;
+  for (let i = 0; i < busId.length; i++) hash = busId.charCodeAt(i) + ((hash << 5) - hash);
+  return colors[Math.abs(hash) % colors.length];
+};
+
+// Dynamic Bus Icon
+const createDynamicBusIcon = (color) => new L.divIcon({
   className: "custom-bus-icon",
   html: `
-    <div style="width: 24px; height: 48px; background: #000; border-radius: 6px; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.4); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 0;">
+    <div style="width: 24px; height: 48px; background: ${color}; border-radius: 6px; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.4); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 0; border: 2px solid #000;">
       <div style="width: 16px; height: 8px; background: #333; border-radius: 2px;"></div>
       <div style="width: 24px; height: 2px; background: rgba(255,255,255,0.2);"></div>
       <div style="width: 16px; height: 8px; background: #facc15; border-radius: 2px;"></div>
@@ -43,6 +48,15 @@ const busIcon = new L.divIcon({
   iconSize: [24, 48],
   iconAnchor: [12, 24]
 });
+
+// Cache for bus icons
+const busIconCache = {};
+const getIconForBus = (busId) => {
+  if (!busIconCache[busId]) {
+    busIconCache[busId] = createDynamicBusIcon(getBusColor(busId));
+  }
+  return busIconCache[busId];
+};
 
 function MapUpdater({ center, zoom, bounds }) {
   const map = useMap();
@@ -56,53 +70,97 @@ function MapUpdater({ center, zoom, bounds }) {
   return null;
 }
 
-export default function MapComponent({ boardingPoint, destination, routeConfirmed }) {
-  const [buses, setBuses] = useState({});
-  const [animatedPos, setAnimatedPos] = useState(null);
+export default function MapComponent({ boardingPoint, destination, routeConfirmed, selectedBusId, buses = {} }) {
+  const [osrmRoute, setOsrmRoute] = useState([]);
   
-  const mapCenter = STOPS[boardingPoint] || [17.7285, 83.2573];
+  const mapCenter = STOPS_DATA[boardingPoint] || [17.7285, 83.2573];
   
   let currentRoute = [];
   let mapBounds = null;
 
-  if (routeConfirmed && boardingPoint && destination && STOPS[boardingPoint] && STOPS[destination]) {
-    currentRoute = [STOPS[boardingPoint], STOPS[destination]];
-    mapBounds = L.latLngBounds([STOPS[boardingPoint], STOPS[destination]]);
-  }
-
-  // Simulate bus movement along the route if confirmed
-  useEffect(() => {
-    let interval;
-    if (routeConfirmed && currentRoute.length === 2) {
-      const [start, end] = currentRoute;
-      let progress = 0;
-      setAnimatedPos(start);
+  // Compute the basic stop coordinates
+  if (routeConfirmed && boardingPoint && destination && STOPS_DATA[boardingPoint] && STOPS_DATA[destination]) {
+    let selectedPath = [];
+    
+    for (const [routeId, stopsArray] of Object.entries(ROUTES_DATA)) {
+      const idxStart = stopsArray.indexOf(boardingPoint);
+      const idxEnd = stopsArray.indexOf(destination);
       
-      interval = setInterval(() => {
-        progress += 0.015; // smooth progress
-        if (progress > 1) {
-          progress = 1;
-          clearInterval(interval);
+      if (idxStart !== -1 && idxEnd !== -1) {
+        let isReversed = idxStart > idxEnd;
+        let startBound = isReversed ? idxEnd : idxStart;
+        let endBound = isReversed ? idxStart : idxEnd;
+        
+        let pathStops = stopsArray.slice(startBound, endBound + 1);
+        if (isReversed) pathStops.reverse();
+        
+        selectedPath = pathStops.map(s => STOPS_DATA[s]).filter(Boolean);
+        if (selectedPath.length > 1) {
+            break;
         }
-        const lat = start[0] + (end[0] - start[0]) * progress;
-        const lng = start[1] + (end[1] - start[1]) * progress;
-        setAnimatedPos([lat, lng]);
-      }, 300);
-    } else {
-      setAnimatedPos(null);
+      }
     }
     
-    return () => { if (interval) clearInterval(interval); };
-  }, [routeConfirmed, boardingPoint, destination]);
+    if (selectedPath.length > 1) {
+        currentRoute = selectedPath;
+        mapBounds = L.latLngBounds(selectedPath);
+    } else {
+        currentRoute = [STOPS_DATA[boardingPoint], STOPS_DATA[destination]];
+        mapBounds = L.latLngBounds([STOPS_DATA[boardingPoint], STOPS_DATA[destination]]);
+    }
+  }
 
+  // Fetch OSRM Road Path (Either Bus->User or User->Dest)
   useEffect(() => {
-    const busesRef = ref(database, 'buses');
-    onValue(busesRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) setBuses(data);
-      else setBuses({});
-    });
-  }, []);
+    if (routeConfirmed && selectedBusId && buses[selectedBusId] && boardingPoint && STOPS_DATA[boardingPoint]) {
+      // Draw path from moving bus to user
+      const bus = buses[selectedBusId];
+      const start = [bus.lat, bus.lng];
+      const end = STOPS_DATA[boardingPoint];
+      
+      const coordsString = `${start[1]},${start[0]};${end[1]},${end[0]}`;
+      const url = `https://router.project-osrm.org/route/v1/driving/${coordsString}?overview=full&geometries=geojson`;
+      
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+           if (data.routes && data.routes.length > 0) {
+             const coords = data.routes[0].geometry.coordinates;
+             setOsrmRoute(coords.map(c => [c[1], c[0]]));
+           } else {
+             setOsrmRoute([start, end]);
+           }
+        })
+        .catch(err => {
+          console.error("OSRM error:", err);
+          setOsrmRoute([start, end]);
+        });
+        
+    } else if (routeConfirmed && currentRoute.length >= 2) {
+      // Draw path from user to destination
+      const coordsString = currentRoute.map(p => `${p[1]},${p[0]}`).join(';');
+      const url = `https://router.project-osrm.org/route/v1/driving/${coordsString}?overview=full&geometries=geojson`;
+      
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+           if (data.routes && data.routes.length > 0) {
+             const coords = data.routes[0].geometry.coordinates;
+             setOsrmRoute(coords.map(c => [c[1], c[0]]));
+           } else {
+             setOsrmRoute(currentRoute);
+           }
+        })
+        .catch(err => {
+          console.error("OSRM error:", err);
+          setOsrmRoute(currentRoute);
+        });
+    } else {
+      setOsrmRoute([]);
+    }
+  }, [routeConfirmed, boardingPoint, destination, selectedBusId, buses]);
+
+  const polylineColor = selectedBusId ? getBusColor(selectedBusId) : "#000000";
 
   return (
     <div style={{ height: "100%", width: "100%", position: "relative" }}>
@@ -122,44 +180,37 @@ export default function MapComponent({ boardingPoint, destination, routeConfirme
       >
         <MapUpdater center={mapCenter} zoom={13} bounds={mapBounds} />
         
-        {/* Clean Light Map Style for premium feel */}
         <TileLayer
           url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
         />
         
-        {/* Solid Route Line */}
-        {routeConfirmed && currentRoute.length === 2 && (
+        {routeConfirmed && osrmRoute.length >= 2 && (
           <Polyline 
-            positions={currentRoute} 
-            color="#000000" 
-            weight={5} 
-            opacity={1} 
+            positions={osrmRoute} 
+            color={polylineColor} 
+            weight={6} 
+            opacity={0.8} 
+            dashArray={selectedBusId ? "10, 10" : ""}
           />
         )}
         
-        {boardingPoint && STOPS[boardingPoint] && (
-          <Marker position={STOPS[boardingPoint]} icon={startIcon}>
+        {boardingPoint && STOPS_DATA[boardingPoint] && (
+          <Marker position={STOPS_DATA[boardingPoint]} icon={startIcon}>
             <Popup className="premium-popup">Pickup: {boardingPoint}</Popup>
           </Marker>
         )}
         
-        {destination && STOPS[destination] && (
-          <Marker position={STOPS[destination]} icon={endIcon}>
+        {destination && STOPS_DATA[destination] && (
+          <Marker position={STOPS_DATA[destination]} icon={endIcon}>
             <Popup className="premium-popup">Drop-off: {destination}</Popup>
           </Marker>
         )}
 
-        {animatedPos && (
-          <Marker position={animatedPos} icon={busIcon}>
-            <Popup className="premium-popup">Your Ride is Arriving</Popup>
-          </Marker>
-        )}
-        
-        {/* Background active buses */}
-        {!routeConfirmed && Object.entries(buses).map(([busNumber, busData]) => (
-          <Marker key={busNumber} position={[busData.lat, busData.lng]} icon={busIcon}>
+        {Object.entries(buses).map(([busId, busData]) => (
+          <Marker key={busId} position={[busData.lat, busData.lng]} icon={getIconForBus(busId)}>
             <Popup className="premium-popup">
-              Route {busNumber} <br/><span style={{color: '#10b981', fontSize: '12px'}}>Active</span>
+              Route {busData.routeId} <br/>
+              <span style={{color: getBusColor(busId), fontSize: '12px'}}>Live Location</span>
             </Popup>
           </Marker>
         ))}

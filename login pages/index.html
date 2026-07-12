@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>RTC Live - Mobile Preview</title>
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #cbd5e1; 
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+    }
+
+    /* --- Virtual Mobile Phone Frame --- */
+    .phone-frame {
+        width: 360px;
+        height: 740px;
+        border: 8px solid #1e293b; 
+        border-radius: 40px; 
+        background-color: #f8fafc; 
+        position: relative;
+        box-shadow: 0 25px 50px -12px rgba(0,0,0,0.3);
+        overflow: hidden; 
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* --- App Screen Content --- */
+    .app-screen {
+        flex: 1;
+        padding: 20px; 
+        display: flex;
+        flex-direction: column;
+        justify-content: center; 
+        align-items: center;
+        overflow-y: auto; 
+    }
+
+    .app-title {
+        color: #0f172a;
+        font-size: 28px;
+        font-weight: 900;
+        letter-spacing: 1.5px;
+        margin-bottom: 25px;
+    }
+
+    /* --- Front Bus Container (Hollow) --- */
+    .card {
+        background: transparent; 
+        padding: 45px 20px 30px; 
+        border: 6px solid #1e293b; 
+        border-radius: 25px 25px 12px 12px; 
+        width: 100%; 
+        box-sizing: border-box;
+        position: relative;
+        margin-bottom: 20px; 
+    }
+
+    /* Top LED Destination Board */
+    .bus-destination {
+        position: absolute;
+        top: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #111827;
+        color: #fde047; 
+        font-size: 10px;
+        font-weight: 800;
+        padding: 4px 16px;
+        border-radius: 6px;
+        letter-spacing: 1.5px;
+        border: 2px solid #334155; 
+    }
+
+    /* The dividing line */
+    .divider-line {
+        width: 80%;
+        height: 1.5px;
+        background: linear-gradient(90deg, transparent, #64748b, transparent);
+        margin: 0 auto 15px auto;
+        opacity: 0.6;
+    }
+
+    /* Bus Wheels */
+    .wheel {
+        position: absolute;
+        bottom: -24px; 
+        width: 42px; 
+        height: 22px; 
+        background-color: #0f172a;
+        border-radius: 6px;
+    }
+    .left-wheel { left: 20px; }
+    .right-wheel { right: 20px; }
+
+
+    /* --- Inside Elements --- */
+    .toggle-group, .role-group {
+        display: flex;
+        background: #f1f5f9;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        padding: 4px; 
+        gap: 4px; 
+    }
+
+    .toggle-group button, .role-group button {
+        flex: 1;
+        padding: 8px;
+        border: 2px solid transparent; 
+        background: transparent;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 13px;
+        color: #64748b;
+        border-radius: 8px;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .toggle-group button.active, .role-group button.active {
+        border: 2px solid #3b82f6; 
+        color: #3b82f6; 
+        background: #ffffff; 
+    }
+
+    .instruction-text {
+        text-align: center;
+        font-size: 12px;
+        color: #475569; 
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+
+    input {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 15px;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        box-sizing: border-box;
+        font-size: 14px;
+        background-color: #f8fafc;
+    }
+    input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        background-color: #ffffff;
+    }
+
+    .main-btn {
+        width: 100%;
+        padding: 14px;
+        background: #10b981; 
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-weight: bold;
+        font-size: 15px;
+        cursor: pointer;
+        margin-top: 5px;
+        transition: background 0.2s;
+    }
+    .main-btn:hover { background: #059669; }
+    
+    /* --- Bumper Area (Headlights & Number Plate) --- */
+    .bumper-area {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 15px; 
+        margin-top: 25px;
+    }
+
+    .headlight {
+        width: 18px;
+        height: 18px;
+        background-color: #fef08a; 
+        border: 2px solid #1e293b; 
+        border-radius: 50%;
+        box-shadow: 0 0 10px rgba(253, 224, 71, 0.7); 
+    }
+
+    .forgot-link {
+        background-color: #facc15; 
+        color: #000000; 
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 900;
+        padding: 6px 14px;
+        border-radius: 4px;
+        border: 2px solid #1e293b; 
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: background 0.2s;
+    }
+    .forgot-link:hover {
+        background-color: #eab308;
+    }
+</style>
+</head>
+<body>
+
+<div class="phone-frame">
+    <div class="app-screen">
+        <div class="app-title">RTC LIVE</div>
+
+        <div class="card">
+            
+            <div class="bus-destination">RTC VIZAG</div>
+            
+            <div class="wheel left-wheel"></div>
+            <div class="wheel right-wheel"></div>
+
+            <div class="divider-line"></div>
+
+            <div class="toggle-group">
+                <button id="tab-login" class="active" onclick="switchMode('login')">Login</button>
+                <button id="tab-signup" onclick="switchMode('signup')">Sign Up</button>
+            </div>
+
+            <div class="role-group">
+                <button class="role-btn active" onclick="selectRole(this, 'User')">User</button>
+                <button class="role-btn" onclick="selectRole(this, 'Driver')">Driver</button>
+                <button class="role-btn" onclick="selectRole(this, 'Admin')">Admin</button>
+            </div>
+
+            <div id="instructionText" class="instruction-text">Enter email and password to login</div>
+
+            <form id="authForm">
+                <input type="email" id="email" placeholder="Email" required>
+                <input type="password" id="password" placeholder="Password" required>
+                
+                <button type="button" class="main-btn" id="actionBtn" onclick="handleAction()">Send OTP</button>
+                
+                <div class="bumper-area">
+                    <div class="headlight"></div>
+                    <a href="#" id="forgotPwd" class="forgot-link">Forgot Password?</a>
+                    <div class="headlight"></div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentMode = 'login';
+    let currentRole = 'User';
+
+    function switchMode(mode) {
+        currentMode = mode;
+        
+        document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+        document.getElementById('tab-signup').classList.toggle('active', mode === 'signup');
+        
+        const actionBtn = document.getElementById('actionBtn');
+        const forgotPwd = document.getElementById('forgotPwd');
+        const instructionText = document.getElementById('instructionText');
+        const passwordInput = document.getElementById('password');
+        
+        if (mode === 'login') {
+            instructionText.innerText = "Enter email and password to login";
+            actionBtn.innerText = 'Send OTP';
+            passwordInput.placeholder = "Password";
+            forgotPwd.style.visibility = 'visible'; 
+        } else {
+            instructionText.innerText = "Enter email and create password to sign up";
+            actionBtn.innerText = 'Create Account';
+            passwordInput.placeholder = "Create Password";
+            forgotPwd.style.visibility = 'hidden'; 
+        }
+    }
+
+    function selectRole(element, role) {
+        currentRole = role;
+        document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('active'));
+        element.classList.add('active');
+    }
+
+    function handleAction() {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        
+        if(!email || !password) {
+            alert('Please fill in all fields.');
+            return;
+        }
+
+        if (currentMode === 'login') {
+            alert(`Sending OTP to ${email} for ${currentRole} login...`);
+        } else {
+            alert(`Creating ${currentRole} account for ${email}...`);
+        }
+    }
+</script>
+</body>
+</html>

@@ -19,7 +19,7 @@ export default function AIChatWidget() {
     setIsAiLoading(true);
 
     try {
-      const apiUrl = `http://${window.location.hostname}:5000/chat`;
+      const apiUrl = `https://ai-snowy-alpha.vercel.app/chat`;
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -47,7 +47,7 @@ export default function AIChatWidget() {
     setIsTyping(true);
 
     try {
-      const apiUrl = `http://${window.location.hostname}:5000/chat`;
+      const apiUrl = `https://ai-snowy-alpha.vercel.app/chat`;
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

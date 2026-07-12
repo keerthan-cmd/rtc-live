@@ -1,54 +1,609 @@
 {
+  "bot_responses": {
+    "greeting": "Hello! I am your RTC Vizag assistant. I can help you find bus routes, timings, and fares. Which route or place are you looking for?",
+    "help": "I can help you find bus routes, first and last bus timings, frequencies, and fares. For example, ask me 'When is the first bus for 10A?' or 'What buses go to NAD?'",
+    "fallback": "I'm sorry, I couldn't find information about that. Try asking about a specific route like '38' or a place like 'RK Beach'."
+  },
   "routes": [
     {
-      "id": "38Y",
-      "name": "Gajuwaka to RTC Complex",
-      "stops": ["Gajuwaka", "Sheela Nagar", "BHPV", "Airport Rd", "NAD", "Kancharapalem", "Maddilapalem", "RTC Complex"],
+      "id": "10A",
+      "name": "Visakhapatnam Airport to R K Beach",
+      "first_bus": "06:00 AM",
+      "last_bus": "09:30 PM",
       "frequency_mins": 15,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "Visakhapatnam Airport",
+        "NAD",
+        "Gurudwara",
+        "RTC Complex",
+        "R K Beach"
+      ]
+    },
+    {
+      "id": "10K",
+      "name": "RTC Complex to Kailasagiri",
+      "first_bus": "06:30 AM",
+      "last_bus": "08:30 PM",
+      "frequency_mins": 20,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "RTC Complex",
+        "Jagadamba",
+        "RK Beach",
+        "VUDA Park",
+        "Tenneti Park",
+        "Kailasagiri"
+      ]
+    },
+    {
+      "id": "111",
+      "name": "Kurmannapalem to Tagarapuvalasa",
+      "first_bus": "05:30 AM",
+      "last_bus": "09:00 PM",
+      "frequency_mins": 15,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "Kurmannapalem",
+        "Gajuwaka",
+        "NAD",
+        "Gurudwara",
+        "Zoo Park",
+        "Madhurawada",
+        "Tagarapuvalasa"
+      ]
+    },
+    {
+      "id": "12D",
+      "name": "RTC Complex to Devarapalle",
+      "first_bus": "05:00 AM",
+      "last_bus": "08:30 PM",
+      "frequency_mins": 30,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "RTC Complex",
+        "NAD",
+        "Gopalapatnam Bus Stop",
+        "Pendurthi",
+        "Kothavalasa",
+        "Anandapuram",
+        "Devarapalle"
+      ]
+    },
+    {
+      "id": "12K",
+      "name": "Town Kotharoad to Kothavalasa",
+      "first_bus": "05:30 AM",
+      "last_bus": "09:00 PM",
+      "frequency_mins": 20,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "Town Kotharoad",
+        "Railway Station",
+        "Kancharapalem",
+        "NAD",
+        "Gopalapatnam",
+        "Pendurthi",
+        "Kothavalasa"
+      ]
+    },
+    {
+      "id": "14",
+      "name": "Venkojipalem to Old Post Office",
+      "first_bus": "06:00 AM",
+      "last_bus": "09:30 PM",
+      "frequency_mins": 15,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "Venkojipalem",
+        "MVP Colony",
+        "Pedda Waltair",
+        "AU Outgate",
+        "Jagadamba",
+        "Town Kotharoad",
+        "Old Post Office"
+      ]
+    },
+    {
+      "id": "14A",
+      "name": "Arilova Colony to Old Post Office",
+      "first_bus": "06:00 AM",
+      "last_bus": "09:00 PM",
+      "frequency_mins": 20,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "Arilova Colony",
+        "Venkojipalem",
+        "MVP Colony",
+        "AU Out Gate",
+        "Jagadamba",
+        "Town Kotharoad",
+        "Old Post Office"
+      ]
+    },
+    {
+      "id": "16",
+      "name": "Purna Market to Yarada",
+      "first_bus": "06:30 AM",
+      "last_bus": "07:30 PM",
+      "frequency_mins": 30,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "Purna Market",
+        "Convent Junction",
+        "Scindia",
+        "Naval Base",
+        "Yarada"
+      ]
+    },
+    {
+      "id": "1T",
+      "name": "VUDA Park to Kapulatunglam",
+      "first_bus": "06:00 AM",
+      "last_bus": "08:30 PM",
+      "frequency_mins": 25,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "VUDA Park",
+        "RK Beach",
+        "Jagadamba",
+        "Town Kotharoad",
+        "Convent",
+        "Scindia",
+        "Gajuwaka",
+        "Kapulatunglam"
+      ]
+    },
+    {
+      "id": "20A",
+      "name": "HB Colony to Old Post Office",
       "first_bus": "05:30 AM",
       "last_bus": "09:30 PM",
-      "fare_range": "₹15 - ₹35"
+      "frequency_mins": 15,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "HB Colony",
+        "Seethammadhara",
+        "Satyam Junction",
+        "RTC Complex",
+        "Jagadamba",
+        "Town Kotharoad",
+        "Old Post Office"
+      ]
     },
     {
-      "id": "400K",
-      "name": "NAD to RTC Complex (via Siripuram)",
-      "stops": ["NAD", "RTO", "Seethammadhara", "Siripuram", "RTC Complex"],
-      "frequency_mins": 20,
-      "first_bus": "06:00 AM",
+      "id": "211",
+      "name": "Railway Station to Vizianagaram",
+      "first_bus": "05:00 AM",
       "last_bus": "10:00 PM",
-      "fare_range": "₹10 - ₹25"
+      "frequency_mins": 15,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "Railway Station",
+        "RTC Complex",
+        "Maddilapalem",
+        "Madhurawada",
+        "Tagarapuvalasa",
+        "Vizianagaram"
+      ]
     },
     {
-      "id": "28Z",
-      "name": "Scindia to RTC Complex",
-      "stops": ["Scindia", "Malkapuram", "Naval Dockyard", "Convent Jct", "RTC Complex"],
+      "id": "28",
+      "name": "RK Beach to Simhachalam Bus Station",
+      "first_bus": "05:30 AM",
+      "last_bus": "09:30 PM",
+      "frequency_mins": 15,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "RK Beach",
+        "Jagadamba Centre",
+        "RTC Complex",
+        "NAD",
+        "Gopalapatnam",
+        "Simhachalam Bus Station"
+      ]
+    },
+    {
+      "id": "28A",
+      "name": "RK Beach to Pendurthi",
+      "first_bus": "05:30 AM",
+      "last_bus": "09:00 PM",
+      "frequency_mins": 20,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "RK Beach",
+        "Jagadamba",
+        "RTC Complex",
+        "NAD",
+        "Gopalapatnam",
+        "Pendurthi"
+      ]
+    },
+    {
+      "id": "28K",
+      "name": "Kothavalasa to RK Beach",
+      "first_bus": "05:00 AM",
+      "last_bus": "08:30 PM",
       "frequency_mins": 30,
-      "first_bus": "06:15 AM",
-      "last_bus": "08:45 PM",
-      "fare_range": "₹15 - ₹30"
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "Kothavalasa",
+        "NAD",
+        "RTC Complex",
+        "Jagadamba",
+        "RK Beach"
+      ]
+    },
+    {
+      "id": "28 Z/H",
+      "name": "Simhachalam Hill Top to Zilla Parishad",
+      "first_bus": "06:00 AM",
+      "last_bus": "08:00 PM",
+      "frequency_mins": 20,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "Simhachalam Hill Top",
+        "Simhachalam",
+        "NAD",
+        "Gurudwara",
+        "RTC Complex",
+        "Zilla Parishad"
+      ]
+    },
+    {
+      "id": "38",
+      "name": "Gajuwaka to RTC Complex",
+      "first_bus": "05:00 AM",
+      "last_bus": "10:00 PM",
+      "frequency_mins": 10,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "Gajuwaka",
+        "NAD",
+        "BHPV",
+        "Gurudwara",
+        "RTC Complex"
+      ]
+    },
+    {
+      "id": "38Y",
+      "name": "RTC Complex to Duvvada Railway Station",
+      "first_bus": "05:30 AM",
+      "last_bus": "09:30 PM",
+      "frequency_mins": 20,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "RTC Complex",
+        "Gurudwara",
+        "NAD",
+        "Gajuwaka",
+        "Duvvada Railway Station"
+      ]
+    },
+    {
+      "id": "48A",
+      "name": "Madhavadhara to Old Post Office",
+      "first_bus": "06:00 AM",
+      "last_bus": "09:00 PM",
+      "frequency_mins": 25,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "Madhavadhara",
+        "Muralinagar",
+        "Kailasapuram",
+        "Akkayapalem",
+        "RTC Complex",
+        "Old Post Office"
+      ]
+    },
+    {
+      "id": "52D",
+      "name": "Old Post Office to Ravindra Nagar",
+      "first_bus": "05:30 AM",
+      "last_bus": "09:00 PM",
+      "frequency_mins": 20,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "Old Post Office",
+        "RTC Complex",
+        "Maddilapalem",
+        "Hanumanthuwaka",
+        "Ravindra Nagar"
+      ]
+    },
+    {
+      "id": "55",
+      "name": "Scindia to Simhachalam",
+      "first_bus": "05:00 AM",
+      "last_bus": "09:30 PM",
+      "frequency_mins": 15,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "Scindia",
+        "Gajuwaka",
+        "NAD",
+        "Gopalapatnam",
+        "Simhachalam"
+      ]
+    },
+    {
+      "id": "55K",
+      "name": "Kothavalasa to Scindia",
+      "first_bus": "05:30 AM",
+      "last_bus": "08:30 PM",
+      "frequency_mins": 30,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "Kothavalasa",
+        "NAD",
+        "Gajuwaka",
+        "Scindia"
+      ]
+    },
+    {
+      "id": "55T",
+      "name": "Old Gajuwaka to Tagarapuvalasa",
+      "first_bus": "05:30 AM",
+      "last_bus": "08:30 PM",
+      "frequency_mins": 25,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "Old Gajuwaka",
+        "NAD",
+        "Pendurthi",
+        "Sontyam",
+        "Anandapuram",
+        "Tagarapuvalasa"
+      ]
+    },
+    {
+      "id": "6",
+      "name": "Simhachalam to Town Kotharoad",
+      "first_bus": "05:30 AM",
+      "last_bus": "09:30 PM",
+      "frequency_mins": 15,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "Simhachalam",
+        "NAD",
+        "Kancharapalem",
+        "Railway Station",
+        "Town Kotharoad"
+      ]
+    },
+    {
+      "id": "6H",
+      "name": "Simhachalam Hill Top to Old Post Office",
+      "first_bus": "06:00 AM",
+      "last_bus": "08:00 PM",
+      "frequency_mins": 20,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "Simhachalam Hill Top",
+        "Simhachalam",
+        "NAD",
+        "Convent Junction",
+        "Old Post Office"
+      ]
+    },
+    {
+      "id": "60C",
+      "name": "Arilova Colony to Old Post Office",
+      "first_bus": "06:00 AM",
+      "last_bus": "09:00 PM",
+      "frequency_mins": 20,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "Arilova Colony",
+        "Maddilapalem",
+        "RTC Complex",
+        "Jagadamba",
+        "Old Post Office"
+      ]
+    },
+    {
+      "id": "68K",
+      "name": "RK Beach to Kothavalasa",
+      "first_bus": "05:30 AM",
+      "last_bus": "08:30 PM",
+      "frequency_mins": 20,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "RK Beach",
+        "RTC Complex",
+        "Maddilapalem",
+        "Hanumanthuwaka",
+        "Simhachalam",
+        "Vepagunta",
+        "Pendurthi",
+        "Kothavalasa"
+      ]
+    },
+    {
+      "id": "205",
+      "name": "Vizianagaram to Anakapalli",
+      "first_bus": "05:00 AM",
+      "last_bus": "09:00 PM",
+      "frequency_mins": 30,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "Vizianagaram",
+        "Bheemasingi",
+        "Kothavalasa",
+        "Pendurthi",
+        "Sabbavaram",
+        "Anakapalli"
+      ]
+    },
+    {
+      "id": "300C",
+      "name": "Chodavaram to RTC Complex",
+      "first_bus": "05:30 AM",
+      "last_bus": "08:30 PM",
+      "frequency_mins": 25,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "Chodavaram",
+        "Sabbavaram",
+        "Pendurthi",
+        "NAD",
+        "RTC Complex"
+      ]
+    },
+    {
+      "id": "300N",
+      "name": "Sabbavaram to RK Beach",
+      "first_bus": "05:30 AM",
+      "last_bus": "08:30 PM",
+      "frequency_mins": 30,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "Sabbavaram",
+        "Narava",
+        "Old Gopalapatnam",
+        "NAD",
+        "Kancharapalem",
+        "RTC Complex",
+        "RK Beach"
+      ]
+    },
+    {
+      "id": "311",
+      "name": "Scindia to Chodavaram",
+      "first_bus": "06:00 AM",
+      "last_bus": "08:30 PM",
+      "frequency_mins": 30,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "Scindia",
+        "Gajuwaka",
+        "Kurmannapalem",
+        "Duvvada",
+        "Sabbavaram",
+        "Chodavaram"
+      ]
+    },
+    {
+      "id": "400",
+      "name": "RTC Complex to Rajeev Nagar",
+      "first_bus": "06:00 AM",
+      "last_bus": "09:00 PM",
+      "frequency_mins": 20,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "RTC Complex",
+        "Railway Station",
+        "Scindia",
+        "Gajuwaka",
+        "Rajeev Nagar"
+      ]
+    },
+    {
+      "id": "541",
+      "name": "Maddilapalem to Kothavalasa",
+      "first_bus": "05:30 AM",
+      "last_bus": "08:30 PM",
+      "frequency_mins": 25,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "Maddilapalem",
+        "Gurudwara",
+        "NAD",
+        "Pendurthi",
+        "Kothavalasa"
+      ]
+    },
+    {
+      "id": "600",
+      "name": "Anakapalli to Scindia",
+      "first_bus": "05:00 AM",
+      "last_bus": "09:00 PM",
+      "frequency_mins": 15,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "Anakapalli",
+        "Aganampudi",
+        "Gajuwaka",
+        "Kurmannapalem",
+        "Scindia"
+      ]
+    },
+    {
+      "id": "700",
+      "name": "Vizianagaram to Simhachalam Hill Top",
+      "first_bus": "06:00 AM",
+      "last_bus": "07:30 PM",
+      "frequency_mins": 30,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "Vizianagaram",
+        "Anandapuram",
+        "Madhurawada",
+        "Hanumanthuwaka",
+        "Simhachalam Hill Top"
+      ]
+    },
+    {
+      "id": "888",
+      "name": "Anakapalli to Tagarapuvalasa",
+      "first_bus": "05:30 AM",
+      "last_bus": "08:30 PM",
+      "frequency_mins": 25,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "Anakapalli",
+        "Sabbavaram",
+        "Pendurthi",
+        "Sontyam",
+        "Anandapuram",
+        "Tagarapuvalasa"
+      ]
     },
     {
       "id": "900K",
-      "name": "Kurmannapalem to Bheemili",
-      "stops": ["Kurmannapalem", "Gajuwaka", "NAD", "RTC Complex", "Maddilapalem", "MVP Colony", "Sagar Nagar", "Bheemili"],
-      "frequency_mins": 45,
-      "first_bus": "05:00 AM",
-      "last_bus": "08:00 PM",
-      "fare_range": "₹20 - ₹60"
+      "name": "Bheemili to Railway Station",
+      "first_bus": "05:30 AM",
+      "last_bus": "09:00 PM",
+      "frequency_mins": 20,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "Bheemili",
+        "INS Kalinga",
+        "Rushikonda",
+        "Sagarnagar",
+        "MVP Colony",
+        "RTC Complex",
+        "Railway Station"
+      ]
     },
     {
-      "id": "500",
-      "name": "Anakapalle to RTC Complex",
-      "stops": ["Anakapalle", "Lankelapalem", "Kurmannapalem", "Gajuwaka", "NAD", "RTC Complex"],
-      "frequency_mins": 15,
-      "first_bus": "04:30 AM",
-      "last_bus": "10:30 PM",
-      "fare_range": "₹30 - ₹50"
+      "id": "25P",
+      "name": "Ratnagiri HB Colony to Old Post Office",
+      "first_bus": "06:00 AM",
+      "last_bus": "09:00 PM",
+      "frequency_mins": 25,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "Ratnagiri HB Colony",
+        "PM Palem",
+        "Endada",
+        "Maddilapalem",
+        "Old Post Office"
+      ]
+    },
+    {
+      "id": "101",
+      "name": "Vizianagaram to Simhachalam",
+      "first_bus": "05:30 AM",
+      "last_bus": "08:30 PM",
+      "frequency_mins": 25,
+      "fare_range": "\u20b910 - \u20b940",
+      "stops": [
+        "Vizianagaram",
+        "Anandapuram",
+        "Hanumanthuwaka",
+        "Simhachalam"
+      ]
     }
-  ],
-  "bot_responses": {
-    "greeting": "Hello! I am your local offline AI Transit Assistant for Vizag. How can I help you today?",
-    "help": "You can ask me about routes (e.g., 'What bus goes to NAD?'), timings ('When is the first bus for 38Y?'), or fares.",
-    "fallback": "I'm sorry, I couldn't understand that. Try asking about a specific route, stop, or say 'help'."
-  }
+  ]
 }

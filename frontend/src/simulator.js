@@ -1,5 +1,6 @@
 import { database, ref, set } from './firebase.js';
-import { ROUTES } from './routes.js';
+import STOPS_DATA from './data/stops.json' assert { type: "json" };
+import ROUTES_DATA from './data/routes_data.json' assert { type: "json" };
 
 // Interpolate between points to make smooth movement
 function getInterpolatedPoint(p1, p2, fraction) {
@@ -9,24 +10,43 @@ function getInterpolatedPoint(p1, p2, fraction) {
   ];
 }
 
-const buses = [
-  { id: '38Y', routeId: '38Y', segment: 0, fraction: 0, speed: 0.05, dir: 1 },
-  { id: '400K', routeId: '400K', segment: 2, fraction: 0.5, speed: 0.04, dir: -1 },
-  { id: '28Z', routeId: '28Z', segment: 1, fraction: 0.2, speed: 0.06, dir: 1 }
-];
+// Select a random sample of routes to simulate traffic
+const allRouteIds = Object.keys(ROUTES_DATA);
+const sampleSize = Math.min(15, allRouteIds.length); // 15 random buses
+const selectedRoutes = [];
 
-console.log("Starting RTC Live Simulator...");
+for (let i = 0; i < sampleSize; i++) {
+  const rId = allRouteIds[Math.floor(Math.random() * allRouteIds.length)];
+  selectedRoutes.push(rId);
+}
+
+const buses = selectedRoutes.map((rId, index) => {
+  return {
+    id: `${rId}-${index}`, 
+    routeId: rId,
+    segment: 0,
+    fraction: Math.random(),
+    speed: 0.03 + (Math.random() * 0.05),
+    dir: Math.random() > 0.5 ? 1 : -1
+  }
+});
+
+console.log(`Starting RTC Live Simulator with ${buses.length} active buses...`);
 
 setInterval(() => {
   buses.forEach(bus => {
-    const routePath = ROUTES[bus.routeId];
+    const stopNames = ROUTES_DATA[bus.routeId];
+    if (!stopNames || stopNames.length < 2) return;
     
-    // Update fraction
+    // Map stop names to coordinates
+    const routePath = stopNames.map(name => STOPS_DATA[name]).filter(Boolean);
+    if (routePath.length < 2) return;
+
     bus.fraction += bus.speed * bus.dir;
 
     if (bus.fraction >= 1) {
       bus.fraction = 0;
-      bus.segment += 1;
+      bus.segment += bus.dir;
       if (bus.segment >= routePath.length - 1) {
         bus.segment = routePath.length - 2;
         bus.fraction = 1;
@@ -34,7 +54,7 @@ setInterval(() => {
       }
     } else if (bus.fraction <= 0) {
       bus.fraction = 1;
-      bus.segment -= 1;
+      bus.segment += bus.dir;
       if (bus.segment < 0) {
         bus.segment = 0;
         bus.fraction = 0;
@@ -44,15 +64,20 @@ setInterval(() => {
 
     const p1 = routePath[bus.segment];
     const p2 = routePath[bus.segment + 1];
-    const currentLoc = getInterpolatedPoint(p1, p2, bus.fraction);
-
-    // Write to Firebase
-    set(ref(database, `buses/${bus.id}`), {
-      lat: currentLoc[0],
-      lng: currentLoc[1],
-      lastUpdated: Date.now(),
-      status: bus.dir === 1 ? "Inbound" : "Outbound"
-    });
+    
+    if (p1 && p2) {
+      const currentLoc = getInterpolatedPoint(p1, p2, bus.fraction);
+      // Write to Firebase
+      set(ref(database, `buses/${bus.id}`), {
+        lat: currentLoc[0],
+        lng: currentLoc[1],
+        lastUpdated: Date.now(),
+        status: bus.dir === 1 ? "Inbound" : "Outbound",
+        routeId: bus.routeId,
+        speed: bus.speed,
+        dir: bus.dir
+      });
+    }
   });
   process.stdout.write(".");
 }, 2000); // Update every 2 seconds

@@ -9,6 +9,7 @@ import OTPPage from "./OTPPage";
 import AIChatWidget from "./AIChatWidget";
 import appLogo from "./logo.png";
 import UserDashboard from "./UserDashboard";
+import DriverDashboard from "./DriverDashboard";
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
@@ -225,82 +226,7 @@ function UserView() {
   return <UserDashboard userEmail={savedSession.email} onLogout={handleLogout} />;
 }
 
-function DriverDashboard() {
-  const [busNumber, setBusNumber] = useState("");
-  const [isTracking, setIsTracking] = useState(false);
-  const [passengers, setPassengers] = useState(12);
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    localStorage.removeItem("rtc_session");
-    navigate("/");
-  };
-
-  useEffect(() => {
-    let watchId = null;
-    if (isTracking && busNumber) {
-      if (!navigator.geolocation) { alert("GPS tracking not supported."); setIsTracking(false); return; }
-      watchId = navigator.geolocation.watchPosition(
-        (position) => {
-          set(ref(database, `buses/${busNumber}`), { lat: position.coords.latitude, lng: position.coords.longitude, lastUpdated: Date.now(), status: "On Route" });
-        },
-        (error) => { console.error(error); alert("Location error."); setIsTracking(false); },
-        { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
-      );
-    } else if (!isTracking && busNumber) {
-        set(ref(database, `buses/${busNumber}`), null); // Remove bus from map when offline
-    }
-    return () => { if (watchId !== null) navigator.geolocation.clearWatch(watchId); };
-  }, [isTracking, busNumber]);
-
-  return (
-    <div style={{ backgroundColor: '#0f172a', minHeight: '100vh', color: 'white', padding: '20px', fontFamily: "'Inter', sans-serif" }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
-         <div style={{ fontSize: '24px', fontWeight: '900', letterSpacing: '1px' }}>RTC <span style={{ color: '#10b981' }}>DRIVER</span></div>
-         <button onClick={handleLogout} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white', padding: '8px 16px', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold' }}>Sign Out</button>
-      </div>
-
-      <div style={{ maxWidth: '500px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        <div style={{ backgroundColor: '#1e293b', padding: '30px', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.3)', border: '1px solid #334155' }}>
-          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-             <h2 style={{ margin: 0, fontSize: '32px', fontWeight: '800' }}>{isTracking ? 'Online' : 'Offline'}</h2>
-             <p style={{ color: '#94a3b8', margin: '5px 0 0 0' }}>{isTracking ? 'Broadcasting live location' : 'Enter route to start'}</p>
-          </div>
-
-          <input 
-            type="text" 
-            placeholder="Route (e.g. 38Y)" 
-            value={busNumber} 
-            onChange={(e) => setBusNumber(e.target.value.toUpperCase())} 
-            disabled={isTracking} 
-            style={{ padding: '18px', marginBottom: '20px', fontSize: '20px', width: '100%', borderRadius: '12px', border: '2px solid #334155', backgroundColor: '#0f172a', color: 'white', boxSizing: 'border-box', textAlign: 'center', fontWeight: 'bold', textTransform: 'uppercase' }} 
-          />
-          
-          <button 
-            onClick={() => setIsTracking(!isTracking)} 
-            disabled={!busNumber} 
-            style={{ width: '100%', padding: '20px', backgroundColor: isTracking ? '#ef4444' : '#10b981', color: 'white', border: 'none', borderRadius: '16px', fontSize: '20px', fontWeight: '900', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '1px', transition: 'transform 0.2s, box-shadow 0.2s', boxShadow: isTracking ? '0 10px 25px rgba(239, 68, 68, 0.4)' : '0 10px 25px rgba(16, 185, 129, 0.4)' }}
-          >
-            {isTracking ? "Go Offline" : "Go Online"}
-          </button>
-        </div>
-
-        {isTracking && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-             <div style={{ backgroundColor: '#1e293b', padding: '20px', borderRadius: '20px', textAlign: 'center', border: '1px solid #334155' }}>
-                <div style={{ fontSize: '12px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 'bold' }}>Next Stop</div>
-                <div style={{ fontSize: '18px', fontWeight: '800', marginTop: '5px', color: '#3b82f6' }}>RTC Complex</div>
-             </div>
-             <div style={{ backgroundColor: '#1e293b', padding: '20px', borderRadius: '20px', textAlign: 'center', border: '1px solid #334155' }}>
-                <div style={{ fontSize: '12px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 'bold' }}>Est. Load</div>
-                <div style={{ fontSize: '24px', fontWeight: '900', marginTop: '5px' }}>{passengers}</div>
-             </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
+// DriverDashboard is imported from DriverDashboard.jsx
 
 function AdminDashboard() {
   const [activeBuses, setActiveBuses] = useState({});

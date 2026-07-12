@@ -5,7 +5,6 @@ export default function AuthPage({ requestedView, onLogin, onSignUp, onForgotPas
   const [role, setRole] = useState('User');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (requestedView) setMode(requestedView);
@@ -13,216 +12,291 @@ export default function AuthPage({ requestedView, onLogin, onSignUp, onForgotPas
 
   const handleAction = (e) => {
     e.preventDefault();
-    if (!email) return alert('Please fill in your email.');
-    
+    if (!email) {
+      alert('Please fill in your email.');
+      return;
+    }
+
     if (mode === 'forgot') {
       onForgotPassword({ email, role });
       return;
     }
 
-    if (!password) return alert('Please fill in your password.');
+    if (!password) {
+      alert('Please fill in your password.');
+      return;
+    }
     
-    if (mode === 'login') onLogin({ email, password, role });
-    else if (mode === 'signup') onSignUp({ email, password, role });
+    if (mode === 'login') {
+      onLogin({ email, password, role });
+    } else if (mode === 'signup') {
+      onSignUp({ email, password, role });
+    }
   };
 
   return (
     <div style={{
-      width: '100vw', height: '100dvh', overflow: 'hidden',
-      backgroundImage: 'url(/login_bg.png)',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif", color: 'white', position: 'relative'
+      fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+      backgroundColor: "#cbd5e1", 
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      minHeight: "100vh",
+      margin: 0,
+      width: "100vw"
     }}>
-      {/* Dark overlay to ensure readability */}
-      <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1 }}></div>
-
       <style>{`
-        .glass-auth-card { 
-          background: rgba(15, 23, 42, 0.45); 
-          backdrop-filter: blur(24px); 
-          -webkit-backdrop-filter: blur(24px); 
-          border: 1px solid rgba(255, 255, 255, 0.15); 
-          box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.1); 
-          border-radius: 32px; 
-          padding: 48px 40px; 
-          width: 100%; 
-          max-width: 440px; 
-          z-index: 10; 
-          transform: translateY(0);
-          transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        .phone-frame {
+            width: 100%;
+            max-width: 480px;
+            min-height: 100vh;
+            background-color: transparent; 
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
-        .glass-auth-card:hover { box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.15); transform: translateY(-4px); }
-        .ultra-input { 
-          width: 100%; 
-          background: rgba(255,255,255,0.05); 
-          border: 1px solid rgba(255,255,255,0.1); 
-          border-radius: 16px; 
-          padding: 18px 20px; 
-          color: white; 
-          outline: none; 
-          transition: all 0.3s; 
-          font-size: 15px; 
-          margin-bottom: 20px; 
-          box-sizing: border-box; 
-          font-weight: 500;
+
+        .app-screen-custom {
+            width: 100%;
+            padding: 20px; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center;
         }
-        .ultra-input::placeholder { color: rgba(255,255,255,0.4); }
-        .ultra-input:focus { 
-          border-color: rgba(255,255,255,0.5); 
-          background: rgba(255,255,255,0.1); 
-          box-shadow: 0 0 0 4px rgba(255,255,255,0.05); 
+
+        .app-title-custom {
+            color: #0f172a;
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            margin-bottom: 25px;
         }
-        .neon-btn { 
-          width: 100%; 
-          background: #ffffff; 
-          color: #0f172a; 
-          border: none; 
-          border-radius: 16px; 
-          padding: 18px; 
-          font-weight: 800; 
-          font-size: 16px; 
-          cursor: pointer; 
-          transition: all 0.3s; 
-          margin-top: 12px;
-          box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+
+        .bus-card {
+            background: transparent; 
+            padding: 45px 20px 30px; 
+            border: 6px solid #1e293b; 
+            border-radius: 25px 25px 12px 12px; 
+            width: 100%; 
+            box-sizing: border-box;
+            position: relative;
+            margin-bottom: 20px; 
         }
-        .neon-btn:hover { 
-          transform: translateY(-2px); 
-          box-shadow: 0 15px 30px rgba(255,255,255,0.2); 
-          background: #f8fafc;
+
+        .bus-destination-led {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #111827;
+            color: #fde047; 
+            font-size: 10px;
+            font-weight: 800;
+            padding: 4px 16px;
+            border-radius: 6px;
+            letter-spacing: 1.5px;
+            border: 2px solid #334155; 
         }
-        .auth-tab { 
-          flex: 1; 
-          background: transparent; 
-          border: none; 
-          color: rgba(255,255,255,0.4); 
-          font-weight: 700; 
-          padding: 12px; 
-          cursor: pointer; 
-          transition: all 0.3s; 
-          font-size: 16px;
-          position: relative;
+
+        .divider-line-custom {
+            width: 80%;
+            height: 1.5px;
+            background: linear-gradient(90deg, transparent, #64748b, transparent);
+            margin: 0 auto 15px auto;
+            opacity: 0.6;
         }
-        .auth-tab.active { color: white; }
-        .auth-tab.active::after {
-          content: '';
-          position: absolute;
-          bottom: 0;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 20px;
-          height: 3px;
-          background: white;
-          border-radius: 3px;
+
+        .wheel-custom {
+            position: absolute;
+            bottom: -24px; 
+            width: 42px; 
+            height: 22px; 
+            background-color: #0f172a;
+            border-radius: 6px;
         }
-        .role-selector {
-          display: flex;
-          background: rgba(0,0,0,0.2);
-          border-radius: 20px;
-          padding: 4px;
-          margin-bottom: 30px;
+        .left-wheel-custom { left: 20px; }
+        .right-wheel-custom { right: 20px; }
+
+        .btn-group-custom {
+            display: flex;
+            background: #f1f5f9;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            padding: 4px; 
+            gap: 4px; 
         }
-        .role-chip { 
-          flex: 1;
-          text-align: center;
-          padding: 8px 0; 
-          border-radius: 16px; 
-          font-size: 13px; 
-          font-weight: 700; 
-          cursor: pointer; 
-          transition: all 0.3s; 
-          color: rgba(255,255,255,0.5); 
+
+        .btn-group-custom button {
+            flex: 1;
+            padding: 8px;
+            border: 2px solid transparent; 
+            background: transparent;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            color: #64748b;
+            border-radius: 8px;
+            transition: all 0.2s ease-in-out;
         }
-        .role-chip.active { 
-          background: rgba(255,255,255,0.15); 
-          color: white; 
-          box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+
+        .btn-group-custom button.active {
+            border: 2px solid #3b82f6; 
+            color: #3b82f6; 
+            background: #ffffff; 
         }
-        .eye-toggle { 
-          position: absolute; 
-          right: 20px; 
-          top: 18px; 
-          background: none; 
-          border: none; 
-          color: rgba(255,255,255,0.4); 
-          cursor: pointer; 
-          font-size: 18px; 
-          transition: color 0.2s; 
-          padding: 0; 
+
+        .instruction-text-custom {
+            text-align: center;
+            font-size: 12px;
+            color: #475569; 
+            margin-bottom: 15px;
+            font-weight: 600;
         }
-        .eye-toggle:hover { color: white; }
+
+        .input-custom {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            box-sizing: border-box;
+            font-size: 14px;
+            background-color: #f8fafc;
+        }
+        .input-custom:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background-color: #ffffff;
+        }
+
+        .main-btn-custom {
+            width: 100%;
+            padding: 14px;
+            background: #10b981; 
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            margin-top: 5px;
+            transition: background 0.2s;
+        }
+        .main-btn-custom:hover { background: #059669; }
+        
+        .bumper-area-custom {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px; 
+            margin-top: 25px;
+        }
+
+        .headlight-custom {
+            width: 18px;
+            height: 18px;
+            background-color: #fef08a; 
+            border: 2px solid #1e293b; 
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(253, 224, 71, 0.7); 
+        }
+
+        .forgot-link-custom {
+            background-color: #facc15; 
+            color: #000000; 
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 900;
+            padding: 6px 14px;
+            border-radius: 4px;
+            border: 2px solid #1e293b; 
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: background 0.2s;
+        }
+        .forgot-link-custom:hover {
+            background-color: #eab308;
+        }
       `}</style>
 
-      <div className="glass-auth-card">
-        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <div style={{ fontSize: '36px', fontWeight: '900', letterSpacing: '-1px', color: 'white' }}>
-            RTC LIVE
+      <div className="phone-frame">
+          <div className="app-screen-custom">
+              <div className="app-title-custom">RTC LIVE</div>
+
+              <div className="bus-card">
+                  
+                  <div className="bus-destination-led">RTC VIZAG</div>
+                  
+                  <div className="wheel-custom left-wheel-custom"></div>
+                  <div className="wheel-custom right-wheel-custom"></div>
+
+                  <div className="divider-line-custom"></div>
+
+                  <div className="btn-group-custom">
+                      <button className={mode === 'login' ? 'active' : ''} onClick={() => setMode('login')}>Login</button>
+                      <button className={mode === 'signup' ? 'active' : ''} onClick={() => setMode('signup')}>Sign Up</button>
+                  </div>
+
+                  <div className="btn-group-custom">
+                      <button className={role === 'User' ? 'active' : ''} onClick={() => setRole('User')}>User</button>
+                      <button className={role === 'Driver' ? 'active' : ''} onClick={() => setRole('Driver')}>Driver</button>
+                      <button className={role === 'Admin' ? 'active' : ''} onClick={() => setRole('Admin')}>Admin</button>
+                  </div>
+
+                  <div className="instruction-text-custom">
+                      {mode === 'login' ? 'Enter email and password to login' : 
+                       mode === 'signup' ? 'Enter email and create password to sign up' : 
+                       'Enter email to receive a secure OTP'}
+                  </div>
+
+                  <form onSubmit={handleAction}>
+                      <input 
+                          type="email" 
+                          className="input-custom" 
+                          placeholder="Email" 
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          required 
+                      />
+                      
+                      {mode !== 'forgot' && (
+                          <input 
+                              type="password" 
+                              className="input-custom" 
+                              placeholder={mode === 'login' ? 'Password' : 'Create Password'} 
+                              value={password}
+                              onChange={(e) => setPassword(e.target.value)}
+                              required 
+                          />
+                      )}
+                      
+                      <button type="submit" className="main-btn-custom">
+                          {mode === 'login' ? 'Send OTP' : 
+                           mode === 'signup' ? 'Create Account' : 
+                           'Send Reset Link'}
+                      </button>
+                      
+                      <div className="bumper-area-custom">
+                          <div className="headlight-custom"></div>
+                          {mode === 'login' && (
+                              <a href="#" className="forgot-link-custom" onClick={(e) => { e.preventDefault(); setMode('forgot'); }}>
+                                  Forgot Password?
+                              </a>
+                          )}
+                          {mode === 'forgot' && (
+                              <a href="#" className="forgot-link-custom" onClick={(e) => { e.preventDefault(); setMode('login'); }}>
+                                  Back to Login
+                              </a>
+                          )}
+                          <div className="headlight-custom"></div>
+                      </div>
+                  </form>
+
+              </div>
           </div>
-          <div style={{ fontSize: '15px', color: 'rgba(255,255,255,0.7)', marginTop: '8px', fontWeight: '500' }}>
-            The city moves with you
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', marginBottom: '32px' }}>
-          <button className={`auth-tab ${mode === 'login' ? 'active' : ''}`} onClick={() => setMode('login')}>Login</button>
-          <button className={`auth-tab ${mode === 'signup' ? 'active' : ''}`} onClick={() => setMode('signup')}>Sign Up</button>
-        </div>
-
-        <div className="role-selector">
-          {['User', 'Driver', 'Admin'].map(r => (
-            <div key={r} className={`role-chip ${role === r ? 'active' : ''}`} onClick={() => setRole(r)}>{r}</div>
-          ))}
-        </div>
-
-        <form onSubmit={handleAction}>
-          <input 
-            type="email" 
-            className="ultra-input" 
-            placeholder="Email Address" 
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          
-          {mode !== 'forgot' && (
-            <div style={{ position: 'relative' }}>
-              <input 
-                type={showPassword ? 'text' : 'password'} 
-                className="ultra-input" 
-                placeholder={mode === 'login' ? 'Password' : 'Create Password'} 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                style={{ paddingRight: '50px' }}
-              />
-              <button 
-                type="button" 
-                className="eye-toggle" 
-                onClick={() => setShowPassword(!showPassword)}
-                title={showPassword ? "Hide Password" : "Show Password"}
-              >
-                <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
-              </button>
-            </div>
-          )}
-
-          <button type="submit" className="neon-btn">
-            {mode === 'login' ? 'Sign In' : mode === 'signup' ? 'Create Account' : 'Send Reset Link'}
-          </button>
-        </form>
-
-        <div style={{ textAlign: 'center', marginTop: '24px' }}>
-          {mode === 'login' && (
-            <a href="#" style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px', textDecoration: 'none', transition: 'color 0.2s', fontWeight: '500' }} onClick={(e) => { e.preventDefault(); setMode('forgot'); }}>
-              Forgot your password?
-            </a>
-          )}
-          {mode === 'forgot' && (
-            <a href="#" style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px', textDecoration: 'none', transition: 'color 0.2s', fontWeight: '500' }} onClick={(e) => { e.preventDefault(); setMode('login'); }}>
-              Back to Login
-            </a>
-          )}
-        </div>
       </div>
     </div>
   );

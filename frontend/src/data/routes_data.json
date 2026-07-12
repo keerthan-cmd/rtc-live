@@ -1,0 +1,298 @@
+{
+  "10A": [
+    "Visakhapatnam Airport",
+    "NAD",
+    "Gurudwara",
+    "RTC Complex",
+    "R K Beach"
+  ],
+  "10K": [
+    "RTC Complex",
+    "Jagadamba",
+    "RK Beach",
+    "VUDA Park",
+    "Tenneti Park",
+    "Kailasagiri"
+  ],
+  "111": [
+    "Kurmannapalem",
+    "Gajuwaka",
+    "NAD",
+    "Gurudwara",
+    "Zoo Park",
+    "Madhurawada",
+    "Tagarapuvalasa"
+  ],
+  "12D": [
+    "RTC Complex",
+    "NAD",
+    "Gopalapatnam Bus Stop",
+    "Pendurthi",
+    "Kothavalasa",
+    "Anandapuram",
+    "Devarapalle"
+  ],
+  "12K": [
+    "Town Kotharoad",
+    "Railway Station",
+    "Kancharapalem",
+    "NAD",
+    "Gopalapatnam",
+    "Pendurthi",
+    "Kothavalasa"
+  ],
+  "14": [
+    "Venkojipalem",
+    "MVP Colony",
+    "Pedda Waltair",
+    "AU Outgate",
+    "Jagadamba",
+    "Town Kotharoad",
+    "Old Post Office"
+  ],
+  "14A": [
+    "Arilova Colony",
+    "Venkojipalem",
+    "MVP Colony",
+    "AU Out Gate",
+    "Jagadamba",
+    "Town Kotharoad",
+    "Old Post Office"
+  ],
+  "16": [
+    "Purna Market",
+    "Convent Junction",
+    "Scindia",
+    "Naval Base",
+    "Yarada"
+  ],
+  "1T": [
+    "VUDA Park",
+    "RK Beach",
+    "Jagadamba",
+    "Town Kotharoad",
+    "Convent",
+    "Scindia",
+    "Gajuwaka",
+    "Kapulatunglam"
+  ],
+  "20A": [
+    "HB Colony",
+    "Seethammadhara",
+    "Satyam Junction",
+    "RTC Complex",
+    "Jagadamba",
+    "Town Kotharoad",
+    "Old Post Office"
+  ],
+  "211": [
+    "Railway Station",
+    "RTC Complex",
+    "Maddilapalem",
+    "Madhurawada",
+    "Tagarapuvalasa",
+    "Vizianagaram"
+  ],
+  "28": [
+    "RK Beach",
+    "Jagadamba Centre",
+    "RTC Complex",
+    "NAD",
+    "Gopalapatnam",
+    "Simhachalam Bus Station"
+  ],
+  "28A": [
+    "RK Beach",
+    "Jagadamba",
+    "RTC Complex",
+    "NAD",
+    "Gopalapatnam",
+    "Pendurthi"
+  ],
+  "28K": [
+    "Kothavalasa",
+    "NAD",
+    "RTC Complex",
+    "Jagadamba",
+    "RK Beach"
+  ],
+  "28 Z/H": [
+    "Simhachalam Hill Top",
+    "Simhachalam",
+    "NAD",
+    "Gurudwara",
+    "RTC Complex",
+    "Zilla Parishad"
+  ],
+  "38": [
+    "Gajuwaka",
+    "NAD",
+    "BHPV",
+    "Gurudwara",
+    "RTC Complex"
+  ],
+  "38Y": [
+    "RTC Complex",
+    "Gurudwara",
+    "NAD",
+    "Gajuwaka",
+    "Duvvada Railway Station"
+  ],
+  "48A": [
+    "Madhavadhara",
+    "Muralinagar",
+    "Kailasapuram",
+    "Akkayapalem",
+    "RTC Complex",
+    "Old Post Office"
+  ],
+  "52D": [
+    "Old Post Office",
+    "RTC Complex",
+    "Maddilapalem",
+    "Hanumanthuwaka",
+    "Ravindra Nagar"
+  ],
+  "55": [
+    "Scindia",
+    "Gajuwaka",
+    "NAD",
+    "Gopalapatnam",
+    "Simhachalam"
+  ],
+  "55K": [
+    "Kothavalasa",
+    "NAD",
+    "Gajuwaka",
+    "Scindia"
+  ],
+  "55T": [
+    "Old Gajuwaka",
+    "NAD",
+    "Pendurthi",
+    "Sontyam",
+    "Anandapuram",
+    "Tagarapuvalasa"
+  ],
+  "6": [
+    "Simhachalam",
+    "NAD",
+    "Kancharapalem",
+    "Railway Station",
+    "Town Kotharoad"
+  ],
+  "6H": [
+    "Simhachalam Hill Top",
+    "Simhachalam",
+    "NAD",
+    "Convent Junction",
+    "Old Post Office"
+  ],
+  "60C": [
+    "Arilova Colony",
+    "Maddilapalem",
+    "RTC Complex",
+    "Jagadamba",
+    "Old Post Office"
+  ],
+  "68K": [
+    "RK Beach",
+    "RTC Complex",
+    "Maddilapalem",
+    "Hanumanthuwaka",
+    "Simhachalam",
+    "Vepagunta",
+    "Pendurthi",
+    "Kothavalasa"
+  ],
+  "205": [
+    "Vizianagaram",
+    "Bheemasingi",
+    "Kothavalasa",
+    "Pendurthi",
+    "Sabbavaram",
+    "Anakapalli"
+  ],
+  "300C": [
+    "Chodavaram",
+    "Sabbavaram",
+    "Pendurthi",
+    "NAD",
+    "RTC Complex"
+  ],
+  "300N": [
+    "Sabbavaram",
+    "Narava",
+    "Old Gopalapatnam",
+    "NAD",
+    "Kancharapalem",
+    "RTC Complex",
+    "RK Beach"
+  ],
+  "311": [
+    "Scindia",
+    "Gajuwaka",
+    "Kurmannapalem",
+    "Duvvada",
+    "Sabbavaram",
+    "Chodavaram"
+  ],
+  "400": [
+    "RTC Complex",
+    "Railway Station",
+    "Scindia",
+    "Gajuwaka",
+    "Rajeev Nagar"
+  ],
+  "541": [
+    "Maddilapalem",
+    "Gurudwara",
+    "NAD",
+    "Pendurthi",
+    "Kothavalasa"
+  ],
+  "600": [
+    "Anakapalli",
+    "Aganampudi",
+    "Gajuwaka",
+    "Kurmannapalem",
+    "Scindia"
+  ],
+  "700": [
+    "Vizianagaram",
+    "Anandapuram",
+    "Madhurawada",
+    "Hanumanthuwaka",
+    "Simhachalam Hill Top"
+  ],
+  "888": [
+    "Anakapalli",
+    "Sabbavaram",
+    "Pendurthi",
+    "Sontyam",
+    "Anandapuram",
+    "Tagarapuvalasa"
+  ],
+  "900K": [
+    "Bheemili",
+    "INS Kalinga",
+    "Rushikonda",
+    "Sagarnagar",
+    "MVP Colony",
+    "RTC Complex",
+    "Railway Station"
+  ],
+  "25P": [
+    "Ratnagiri HB Colony",
+    "PM Palem",
+    "Endada",
+    "Maddilapalem",
+    "Old Post Office"
+  ],
+  "101": [
+    "Vizianagaram",
+    "Anandapuram",
+    "Hanumanthuwaka",
+    "Simhachalam"
+  ]
+}

@@ -1,0 +1,39 @@
+Route Number,Source,Destination,Via,Bus Type,First Bus,Last Bus,Frequency (Mins)
+10A,Visakhapatnam Airport,R K Beach,"NAD, Gurudwara, RTC Complex",Metro Express,06:00 AM,09:30 PM,15
+10K,RTC Complex,Kailasagiri,"Jagadamba, RK Beach, VUDA Park, Tenneti Park",Metro Express,06:30 AM,08:30 PM,20
+111,Kurmannapalem,Tagarapuvalasa,"Gajuwaka, NAD, Gurudwara, Zoo Park, Madhurawada",Metro Express,05:30 AM,09:00 PM,15
+12D,RTC Complex,Devarapalle,"NAD, Gopalapatnam Bus Stop, Pendurthi, Kothavalasa, Anandapuram",City Ordinary,05:00 AM,08:30 PM,30
+12K,Town Kotharoad,Kothavalasa,"Railway Station, Kancharapalem, NAD, Gopalapatnam, Pendurthi",City Ordinary,05:30 AM,09:00 PM,20
+14,Venkojipalem,Old Post Office,"MVP Colony, Pedda Waltair, AU Outgate, Jagadamba, Town Kotharoad",Metro Express,06:00 AM,09:30 PM,15
+14A,Arilova Colony,Old Post Office,"Venkojipalem, MVP Colony, AU Out Gate, Jagadamba, Town Kotharoad",City Ordinary,06:00 AM,09:00 PM,20
+16,Purna Market,Yarada,"Convent Junction, Scindia, Naval Base",City Ordinary,06:30 AM,07:30 PM,30
+1T,VUDA Park,Kapulatunglam,"RK Beach, Jagadamba, Town Kotharoad, Convent, Scindia, Gajuwaka",City Ordinary,06:00 AM,08:30 PM,25
+20A,HB Colony,Old Post Office,"Seethammadhara, Satyam Junction, RTC Complex, Jagadamba, Town Kotharoad",Metro Express,05:30 AM,09:30 PM,15
+211,Railway Station,Vizianagaram,"RTC Complex, Maddilapalem, Madhurawada, Tagarapuvalasa",Metro Express,05:00 AM,10:00 PM,15
+28,RK Beach,Simhachalam Bus Station,"Jagadamba Centre, RTC Complex, NAD, Gopalapatnam",Metro Express,05:30 AM,09:30 PM,15
+28A,RK Beach,Pendurthi,"Jagadamba, RTC Complex, NAD, Gopalapatnam",City Ordinary,05:30 AM,09:00 PM,20
+28K,Kothavalasa,RK Beach,"NAD, RTC Complex, Jagadamba",City Ordinary,05:00 AM,08:30 PM,30
+28 Z/H,Simhachalam Hill Top,Zilla Parishad,"Simhachalam, NAD, Gurudwara, RTC Complex",Metro Express,06:00 AM,08:00 PM,20
+38,Gajuwaka,RTC Complex,"NAD, BHPV, Gurudwara",Metro Express,05:00 AM,10:00 PM,10
+38Y,RTC Complex,Duvvada Railway Station,"Gurudwara, NAD, Gajuwaka",Metro Express,05:30 AM,09:30 PM,20
+48A,Madhavadhara,Old Post Office,"Muralinagar, Kailasapuram, Akkayapalem, RTC Complex",City Ordinary,06:00 AM,09:00 PM,25
+52D,Old Post Office,Ravindra Nagar,"RTC Complex, Maddilapalem, Hanumanthuwaka",City Ordinary,05:30 AM,09:00 PM,20
+55,Scindia,Simhachalam,"Gajuwaka, NAD, Gopalapatnam",Metro Express,05:00 AM,09:30 PM,15
+55K,Kothavalasa,Scindia,"NAD, Gajuwaka",City Ordinary,05:30 AM,08:30 PM,30
+55T,Old Gajuwaka,Tagarapuvalasa,"NAD, Pendurthi, Sontyam, Anandapuram",Metro Express,05:30 AM,08:30 PM,25
+6,Simhachalam,Town Kotharoad,"NAD, Kancharapalem, Railway Station",City Ordinary,05:30 AM,09:30 PM,15
+6H,Simhachalam Hill Top,Old Post Office,"Simhachalam, NAD, Convent Junction",Metro Express,06:00 AM,08:00 PM,20
+60C,Arilova Colony,Old Post Office,"Maddilapalem, RTC Complex, Jagadamba",City Ordinary,06:00 AM,09:00 PM,20
+68K,RK Beach,Kothavalasa,"RTC Complex, Maddilapalem, Hanumanthuwaka, Simhachalam, Vepagunta, Pendurthi",Metro Express,05:30 AM,08:30 PM,20
+205,Vizianagaram,Anakapalli,"Bheemasingi, Kothavalasa, Pendurthi, Sabbavaram",Metro Express,05:00 AM,09:00 PM,30
+300C,Chodavaram,RTC Complex,"Sabbavaram, Pendurthi, NAD",Metro Express,05:30 AM,08:30 PM,25
+300N,Sabbavaram,RK Beach,"Narava, Old Gopalapatnam, NAD, Kancharapalem, RTC Complex",City Ordinary,05:30 AM,08:30 PM,30
+311,Scindia,Chodavaram,"Gajuwaka, Kurmannapalem, Duvvada, Sabbavaram",City Ordinary,06:00 AM,08:30 PM,30
+400,RTC Complex,Rajeev Nagar,"Railway Station, Scindia, Gajuwaka",City Ordinary,06:00 AM,09:00 PM,20
+541,Maddilapalem,Kothavalasa,"Gurudwara, NAD, Pendurthi",City Ordinary,05:30 AM,08:30 PM,25
+600,Anakapalli,Scindia,"Aganampudi, Gajuwaka, Kurmannapalem",Metro Express,05:00 AM,09:00 PM,15
+700,Vizianagaram,Simhachalam Hill Top,"Anandapuram, Madhurawada, Hanumanthuwaka",Metro Express,06:00 AM,07:30 PM,30
+888,Anakapalli,Tagarapuvalasa,"Sabbavaram, Pendurthi, Sontyam, Anandapuram",Metro Express,05:30 AM,08:30 PM,25
+900K,Bheemili,Railway Station,"INS Kalinga, Rushikonda, Sagarnagar, MVP Colony, RTC Complex",Metro Express,05:30 AM,09:00 PM,20
+25P,Ratnagiri HB Colony,Old Post Office,"PM Palem, Endada, Maddilapalem",City Ordinary,06:00 AM,09:00 PM,25
+101,Vizianagaram,Simhachalam,"Anandapuram, Hanumanthuwaka",Metro Express,05:30 AM,08:30 PM,25

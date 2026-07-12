@@ -1,7 +1,20 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import MapComponent from "./MapComponent";
 import AIChatWidget from "./AIChatWidget";
-import { MyRoutes, RideHistory, RouteSchedules, Settings } from "./DashboardScreens";
+import STOPS_DATA from "./data/stops.json";
+import ROUTES_DATA from "./data/routes_data.json";
+import { database, ref, onValue } from "./firebase";
+
+function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+  const R = 6371; 
+  const dLat = (lat2-lat1) * (Math.PI/180);
+  const dLon = (lon2-lon1) * (Math.PI/180); 
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1 * (Math.PI/180)) * Math.cos(lat2 * (Math.PI/180)) * 
+            Math.sin(dLon/2) * Math.sin(dLon/2); 
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+  return R * c; 
+}
 
 export default function UserDashboard({ userEmail, onLogout }) {
   const [activeScreen, setActiveScreen] = useState('home'); 
@@ -11,16 +24,30 @@ export default function UserDashboard({ userEmail, onLogout }) {
   // Map state
   const [boardingPoint, setBoardingPoint] = useState('');
   const [destination, setDestination] = useState('');
-  const [eta, setEta] = useState(null);
-  const [isCalculatingAI, setIsCalculatingAI] = useState(false);
   const [routeConfirmed, setRouteConfirmed] = useState(false);
+  
+  // Live Bus Data
+  const [buses, setBuses] = useState({});
+  const [selectedBusId, setSelectedBusId] = useState(null);
   
   // UI states for Bottom Sheet
   const [sheetState, setSheetState] = useState('half'); // 'hidden', 'half', 'full'
+  const stopNames = Object.keys(STOPS_DATA || {}).sort();
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
+
+  // Subscribe to live buses
+  useEffect(() => {
+    const busesRef = ref(database, 'buses');
+    const unsubscribe = onValue(busesRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) setBuses(data);
+      else setBuses({});
+    });
+    return () => unsubscribe();
+  }, []);
 
   const toggleTheme = () => setTheme(theme === 'light' ? 'dark' : 'light');
 
@@ -31,11 +58,7 @@ export default function UserDashboard({ userEmail, onLogout }) {
     }
     setRouteConfirmed(true);
     setSheetState('half');
-    setIsCalculatingAI(true);
-    setTimeout(() => {
-      setEta(Math.floor(Math.random() * 10) + 5); 
-      setIsCalculatingAI(false);
-    }, 1500);
+    setSelectedBusId(null);
   };
 
   const handleGoHome = () => {
@@ -44,7 +67,7 @@ export default function UserDashboard({ userEmail, onLogout }) {
     setDestination('');
     setRouteConfirmed(false);
     setSheetState('half');
-    setEta(null);
+    setSelectedBusId(null);
   };
 
   const navigateTo = (screen) => {
@@ -54,6 +77,37 @@ export default function UserDashboard({ userEmail, onLogout }) {
       setSheetState('half');
     }
   };
+
+  // Calculate incoming buses dynamically
+  const incomingBuses = useMemo(() => {
+    if (!routeConfirmed || !boardingPoint || !destination) return [];
+    
+    const startCoords = STOPS_DATA[boardingPoint];
+    if (!startCoords) return [];
+
+    let validBuses = [];
+    Object.values(buses).forEach(bus => {
+      if (!bus.routeId || !ROUTES_DATA[bus.routeId]) return;
+      const stopsArray = ROUTES_DATA[bus.routeId];
+      const idxA = stopsArray.indexOf(boardingPoint);
+      const idxB = stopsArray.indexOf(destination);
+
+      if (idxA !== -1 && idxB !== -1) {
+        // Check direction
+        const requiredDir = idxA < idxB ? 1 : -1;
+        if (bus.dir === requiredDir) {
+          const dist = getDistanceFromLatLonInKm(bus.lat, bus.lng, startCoords[0], startCoords[1]);
+          // Approximate ETA (dist / speed factor)
+          const etaMins = Math.max(1, Math.round(dist / (bus.speed * 20))); 
+          validBuses.push({ ...bus, dist, etaMins });
+        }
+      }
+    });
+
+    // Sort by ETA ascending
+    validBuses.sort((a, b) => a.etaMins - b.etaMins);
+    return validBuses;
+  }, [buses, routeConfirmed, boardingPoint, destination]);
 
   return (
     <div className={`app-root ${theme}`}>
@@ -176,11 +230,20 @@ export default function UserDashboard({ userEmail, onLogout }) {
         }
         .black-btn:hover { transform: scale(0.98); }
 
-        /* Confirmed State UI */
-        .eta-display { display: flex; align-items: center; gap: 16px; padding: 16px; background: var(--background); border-radius: 16px; margin-bottom: 16px; border: 1px solid var(--border); }
-        .eta-time { font-size: 24px; font-weight: 800; color: var(--text-dark); }
-        .eta-label { font-size: 14px; color: var(--text-muted); font-weight: 500; }
-        .fare-badge { margin-left: auto; background: var(--surface); padding: 8px 12px; border-radius: 12px; font-weight: 700; font-size: 14px; border: 1px solid var(--border); }
+        /* Bus List UI */
+        .bus-list { max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 5px; margin-bottom: 15px; }
+        .bus-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--background); border: 2px solid transparent; border-radius: 12px; cursor: pointer; transition: all 0.2s; }
+        .bus-item:hover { border-color: var(--border); }
+        .bus-item.selected { border-color: var(--text-dark); background: var(--surface); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        
+        .bus-info-left { display: flex; align-items: center; gap: 12px; }
+        .bus-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--text-dark); }
+        .bus-route-id { font-weight: 800; font-size: 16px; color: var(--text-dark); }
+        .bus-status { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+        
+        .bus-info-right { text-align: right; }
+        .bus-eta { font-weight: 800; font-size: 18px; color: var(--success); }
+        .bus-dist { font-size: 12px; color: var(--text-muted); }
       `}</style>
 
       <div className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
@@ -229,6 +292,8 @@ export default function UserDashboard({ userEmail, onLogout }) {
                 boardingPoint={boardingPoint} 
                 destination={destination} 
                 routeConfirmed={routeConfirmed} 
+                selectedBusId={selectedBusId}
+                buses={buses}
               />
             )}
           </div>
@@ -251,47 +316,66 @@ export default function UserDashboard({ userEmail, onLogout }) {
                   <div className="inputs-column">
                     <select className="sheet-input" value={boardingPoint} onChange={(e) => setBoardingPoint(e.target.value)}>
                       <option value="" disabled>Current Location</option>
-                      <option value="Gajuwaka">Gajuwaka</option>
-                      <option value="NAD">NAD</option>
-                      <option value="RTC Complex">RTC Complex</option>
+                      {stopNames.map(stop => (
+                        <option key={stop} value={stop}>{stop}</option>
+                      ))}
                     </select>
                     <select className="sheet-input" value={destination} onChange={(e) => setDestination(e.target.value)}>
                       <option value="" disabled>Where to?</option>
-                      <option value="NAD">NAD</option>
-                      <option value="RTC Complex">RTC Complex</option>
-                      <option value="Maddilapalem">Maddilapalem</option>
+                      {stopNames.map(stop => (
+                        <option key={stop} value={stop}>{stop}</option>
+                      ))}
                     </select>
                   </div>
                 </div>
                 {boardingPoint && destination && (
                   <button className="black-btn" onClick={(e) => { e.stopPropagation(); handleStartTracking(); }}>
-                    Confirm Route
+                    Find Buses
                   </button>
                 )}
               </>
             ) : (
               <>
                 <div className="sheet-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span>En Route to {destination}</span>
-                  <button style={{ background: 'var(--background)', border: 'none', padding: '8px', borderRadius: '50%', cursor: 'pointer' }} onClick={(e) => { e.stopPropagation(); setRouteConfirmed(false); setEta(null); }}>
+                  <span>Incoming Buses</span>
+                  <button style={{ background: 'var(--background)', border: 'none', padding: '8px', borderRadius: '50%', cursor: 'pointer' }} onClick={(e) => { e.stopPropagation(); setRouteConfirmed(false); setSelectedBusId(null); }}>
                     <i className="fas fa-times" style={{ color: 'var(--text-muted)' }}></i>
                   </button>
                 </div>
-                <div className="eta-display">
-                  {isCalculatingAI ? (
-                    <div className="eta-time"><i className="fas fa-circle-notch fa-spin"></i></div>
-                  ) : (
-                    <div className="eta-time">{eta}<span style={{fontSize: '16px'}}> min</span></div>
-                  )}
-                  <div className="eta-label">
-                    <div>Live ETA</div>
-                    <div style={{color: 'var(--success)'}}>Fastest route</div>
+                
+                {incomingBuses.length > 0 ? (
+                  <div className="bus-list">
+                    {incomingBuses.map(bus => (
+                      <div 
+                        key={bus.id} 
+                        className={`bus-item ${selectedBusId === bus.id ? 'selected' : ''}`}
+                        onClick={(e) => { e.stopPropagation(); setSelectedBusId(bus.id); }}
+                      >
+                        <div className="bus-info-left">
+                          <div className="bus-icon"><i className="fas fa-bus-alt"></i></div>
+                          <div>
+                            <div className="bus-route-id">Route {bus.routeId}</div>
+                            <div className="bus-status">Live Location</div>
+                          </div>
+                        </div>
+                        <div className="bus-info-right">
+                          <div className="bus-eta">{bus.etaMins} min</div>
+                          <div className="bus-dist">{bus.dist.toFixed(1)} km away</div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <div className="fare-badge">₹ 25.00</div>
-                </div>
-                <div style={{ fontSize: '14px', color: 'var(--text-muted)', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <i className="fas fa-shield-alt"></i> Trip monitored securely
-                </div>
+                ) : (
+                  <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-muted)', fontWeight: '600' }}>
+                    No active buses found on this route right now.
+                  </div>
+                )}
+                
+                {selectedBusId && (
+                  <div style={{ fontSize: '14px', color: 'var(--text-muted)', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px', marginTop: '10px' }}>
+                    <i className="fas fa-shield-alt"></i> Trip monitored securely
+                  </div>
+                )}
               </>
             )}
           </div>
