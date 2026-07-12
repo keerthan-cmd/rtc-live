@@ -28,35 +28,6 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(let e of thi
         .premium-popup .leaflet-popup-content { margin: 12px 16px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: #0f172a; text-align: center; }
         .premium-popup .leaflet-popup-tip { box-shadow: none; }
       `}),(0,$.jsxs)(um,{center:s,zoom:13,style:{height:`100%`,width:`100%`},zoomControl:!1,children:[(0,$.jsx)(Em,{center:s,zoom:13,bounds:l}),(0,$.jsx)(mm,{url:`https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png`}),n&&a.length>=2&&(0,$.jsx)(fm,{positions:a,color:u,weight:6,opacity:.8,dashArray:r?`10, 10`:``}),e&&hm[e]&&(0,$.jsx)(dm,{position:hm[e],icon:bm,children:(0,$.jsxs)(pm,{className:`premium-popup`,children:[`Pickup: `,e]})}),t&&hm[t]&&(0,$.jsx)(dm,{position:hm[t],icon:xm,children:(0,$.jsxs)(pm,{className:`premium-popup`,children:[`Drop-off: `,t]})}),Object.entries(i).map(([e,t])=>(0,$.jsx)(dm,{position:[t.lat,t.lng],icon:Tm(e),children:(0,$.jsxs)(pm,{className:`premium-popup`,children:[`Route `,t.routeId,` `,(0,$.jsx)(`br`,{}),(0,$.jsx)(`span`,{style:{color:Sm(e),fontSize:`12px`},children:`Live Location`})]})},e))]})]})}function Om({requestedView:e,onLogin:t,onSignUp:n,onForgotPassword:r}){let[i,a]=(0,_.useState)(`login`),[o,s]=(0,_.useState)(`User`),[c,l]=(0,_.useState)(``),[u,d]=(0,_.useState)(``),[f,p]=(0,_.useState)(!1);return(0,_.useEffect)(()=>{e&&a(e)},[e]),(0,$.jsxs)(`div`,{style:{fontFamily:`'Segoe UI', Tahoma, Geneva, Verdana, sans-serif`,backgroundColor:`#cbd5e1`,display:`flex`,justifyContent:`center`,alignItems:`center`,minHeight:`100vh`,margin:0,width:`100vw`,padding:`20px`,boxSizing:`border-box`},children:[(0,$.jsx)(`style`,{children:`
-        .phone-frame {
-            width: 100%;
-            max-width: 420px;
-            min-height: 90vh;
-            border: 8px solid #1e293b; 
-            border-radius: 40px; 
-            background-color: #f8fafc; 
-            position: relative;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.3);
-            display: flex;
-            flex-direction: column;
-            margin: auto;
-            overflow-y: auto;
-            color: #333;
-        }
-
-        @media (max-width: 480px) {
-            .phone-frame {
-                border: none;
-                border-radius: 0;
-                min-height: 100vh;
-                margin: 0;
-                box-shadow: none;
-            }
-            body > div {
-                padding: 0 !important;
-            }
-        }
-
         .app-screen {
             flex: 1;
             padding: 20px; 
@@ -64,6 +35,9 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(let e of thi
             flex-direction: column;
             justify-content: center; 
             align-items: center;
+            width: 100%;
+            max-width: 420px;
+            margin: auto;
         }
 
         .app-title {
@@ -239,7 +213,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(let e of thi
         .forgot-link:hover {
             background-color: #eab308;
         }
-      `}),(0,$.jsx)(`div`,{className:`phone-frame`,children:(0,$.jsxs)(`div`,{className:`app-screen`,children:[(0,$.jsx)(`div`,{className:`app-title`,children:`RTC LIVE`}),(0,$.jsxs)(`div`,{className:`bus-card`,children:[(0,$.jsx)(`div`,{className:`bus-destination`,children:`RTC VIZAG`}),(0,$.jsx)(`div`,{className:`wheel left-wheel`}),(0,$.jsx)(`div`,{className:`wheel right-wheel`}),(0,$.jsx)(`div`,{className:`divider-line`}),(0,$.jsxs)(`div`,{className:`toggle-group`,children:[(0,$.jsx)(`button`,{type:`button`,className:i===`login`?`active`:``,onClick:()=>a(`login`),children:`Login`}),(0,$.jsx)(`button`,{type:`button`,className:i===`signup`?`active`:``,onClick:()=>a(`signup`),children:`Sign Up`})]}),(0,$.jsxs)(`div`,{className:`role-group`,children:[(0,$.jsx)(`button`,{type:`button`,className:o===`User`?`active`:``,onClick:()=>s(`User`),children:`User`}),(0,$.jsx)(`button`,{type:`button`,className:o===`Driver`?`active`:``,onClick:()=>s(`Driver`),children:`Driver`}),(0,$.jsx)(`button`,{type:`button`,className:o===`Admin`?`active`:``,onClick:()=>s(`Admin`),children:`Admin`})]}),(0,$.jsx)(`div`,{className:`instruction-text`,children:i===`login`?`Enter email and password to login`:i===`signup`?`Enter email and create password to sign up`:`Enter email to receive a secure OTP`}),(0,$.jsxs)(`form`,{onSubmit:e=>{if(e.preventDefault(),!c){alert(`Please fill in your email.`);return}if(i===`forgot`){r({email:c,role:o});return}if(!u){alert(`Please fill in your password.`);return}i===`login`?t({email:c,password:u,role:o}):i===`signup`&&n({email:c,password:u,role:o})},children:[(0,$.jsx)(`div`,{className:`input-group`,children:(0,$.jsx)(`input`,{type:`email`,className:`input-custom`,placeholder:`Email`,value:c,onChange:e=>l(e.target.value),required:!0})}),i!==`forgot`&&(0,$.jsxs)(`div`,{className:`input-group`,children:[(0,$.jsx)(`input`,{type:f?`text`:`password`,className:`input-custom`,placeholder:i===`login`?`Password`:`Create Password`,value:u,onChange:e=>d(e.target.value),required:!0,style:{paddingRight:`50px`}}),(0,$.jsx)(`button`,{type:`button`,className:`show-pass-btn`,onClick:()=>p(!f),children:f?`HIDE`:`SHOW`})]}),(0,$.jsx)(`button`,{type:`submit`,className:`main-btn`,children:i===`login`?`Login`:i===`signup`?`Create Account`:`Send Reset Link`}),(0,$.jsxs)(`div`,{className:`bumper-area`,children:[(0,$.jsx)(`div`,{className:`headlight`}),i===`login`&&(0,$.jsx)(`a`,{href:`#`,className:`forgot-link`,onClick:e=>{e.preventDefault(),a(`forgot`)},children:`Forgot Password?`}),i===`forgot`&&(0,$.jsx)(`a`,{href:`#`,className:`forgot-link`,onClick:e=>{e.preventDefault(),a(`login`)},children:`Back to Login`}),(0,$.jsx)(`div`,{className:`headlight`})]})]})]})]})})]})}function km({email:e,role:t,onVerify:n,onGoBack:r}){let[i,a]=(0,_.useState)([``,``,``,``,``,``]),[o,s]=(0,_.useState)(55),c=(0,_.useRef)([]);(0,_.useEffect)(()=>{if(o<=0)return;let e=setInterval(()=>s(e=>e-1),1e3);return()=>clearInterval(e)},[o]);let l=(e,t)=>{let n=t.replace(/[^0-9]/g,``);if(!n&&t!==``)return;let r=[...i];r[e]=n,a(r),n&&e<5&&c.current[e+1].focus()},u=(e,t)=>{t.key===`Backspace`&&!i[e]&&e>0&&c.current[e-1].focus()};return(0,$.jsxs)(`div`,{style:{fontFamily:`'Segoe UI', Tahoma, Geneva, Verdana, sans-serif`,backgroundColor:`#cbd5e1`,display:`flex`,justifyContent:`center`,alignItems:`center`,minHeight:`100vh`,margin:0,width:`100vw`},children:[(0,$.jsx)(`style`,{children:`
+      `}),(0,$.jsxs)(`div`,{className:`app-screen`,children:[(0,$.jsx)(`div`,{className:`app-title`,children:`RTC LIVE`}),(0,$.jsxs)(`div`,{className:`bus-card`,children:[(0,$.jsx)(`div`,{className:`bus-destination`,children:`RTC VIZAG`}),(0,$.jsx)(`div`,{className:`wheel left-wheel`}),(0,$.jsx)(`div`,{className:`wheel right-wheel`}),(0,$.jsx)(`div`,{className:`divider-line`}),(0,$.jsxs)(`div`,{className:`toggle-group`,children:[(0,$.jsx)(`button`,{type:`button`,className:i===`login`?`active`:``,onClick:()=>a(`login`),children:`Login`}),(0,$.jsx)(`button`,{type:`button`,className:i===`signup`?`active`:``,onClick:()=>a(`signup`),children:`Sign Up`})]}),(0,$.jsxs)(`div`,{className:`role-group`,children:[(0,$.jsx)(`button`,{type:`button`,className:o===`User`?`active`:``,onClick:()=>s(`User`),children:`User`}),(0,$.jsx)(`button`,{type:`button`,className:o===`Driver`?`active`:``,onClick:()=>s(`Driver`),children:`Driver`}),(0,$.jsx)(`button`,{type:`button`,className:o===`Admin`?`active`:``,onClick:()=>s(`Admin`),children:`Admin`})]}),(0,$.jsx)(`div`,{className:`instruction-text`,children:i===`login`?`Enter email and password to login`:i===`signup`?`Enter email and create password to sign up`:`Enter email to receive a secure OTP`}),(0,$.jsxs)(`form`,{onSubmit:e=>{if(e.preventDefault(),!c){alert(`Please fill in your email.`);return}if(i===`forgot`){r({email:c,role:o});return}if(!u){alert(`Please fill in your password.`);return}i===`login`?t({email:c,password:u,role:o}):i===`signup`&&n({email:c,password:u,role:o})},children:[(0,$.jsx)(`div`,{className:`input-group`,children:(0,$.jsx)(`input`,{type:`email`,className:`input-custom`,placeholder:`Email`,value:c,onChange:e=>l(e.target.value),required:!0})}),i!==`forgot`&&(0,$.jsxs)(`div`,{className:`input-group`,children:[(0,$.jsx)(`input`,{type:f?`text`:`password`,className:`input-custom`,placeholder:i===`login`?`Password`:`Create Password`,value:u,onChange:e=>d(e.target.value),required:!0,style:{paddingRight:`50px`}}),(0,$.jsx)(`button`,{type:`button`,className:`show-pass-btn`,onClick:()=>p(!f),children:f?`HIDE`:`SHOW`})]}),(0,$.jsx)(`button`,{type:`submit`,className:`main-btn`,children:i===`login`?`Login`:i===`signup`?`Create Account`:`Send Reset Link`}),(0,$.jsxs)(`div`,{className:`bumper-area`,children:[(0,$.jsx)(`div`,{className:`headlight`}),i===`login`&&(0,$.jsx)(`a`,{href:`#`,className:`forgot-link`,onClick:e=>{e.preventDefault(),a(`forgot`)},children:`Forgot Password?`}),i===`forgot`&&(0,$.jsx)(`a`,{href:`#`,className:`forgot-link`,onClick:e=>{e.preventDefault(),a(`login`)},children:`Back to Login`}),(0,$.jsx)(`div`,{className:`headlight`})]})]})]})]})]})}function km({email:e,role:t,onVerify:n,onGoBack:r}){let[i,a]=(0,_.useState)([``,``,``,``,``,``]),[o,s]=(0,_.useState)(55),c=(0,_.useRef)([]);(0,_.useEffect)(()=>{if(o<=0)return;let e=setInterval(()=>s(e=>e-1),1e3);return()=>clearInterval(e)},[o]);let l=(e,t)=>{let n=t.replace(/[^0-9]/g,``);if(!n&&t!==``)return;let r=[...i];r[e]=n,a(r),n&&e<5&&c.current[e+1].focus()},u=(e,t)=>{t.key===`Backspace`&&!i[e]&&e>0&&c.current[e-1].focus()};return(0,$.jsxs)(`div`,{style:{fontFamily:`'Segoe UI', Tahoma, Geneva, Verdana, sans-serif`,backgroundColor:`#cbd5e1`,display:`flex`,justifyContent:`center`,alignItems:`center`,minHeight:`100vh`,margin:0,width:`100vw`},children:[(0,$.jsx)(`style`,{children:`
         .phone-frame {
             width: 100%;
             max-width: 480px;
