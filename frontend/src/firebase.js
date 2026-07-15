@@ -2,13 +2,13 @@ import { initializeApp } from "firebase/app";
 import { getDatabase, ref, set, onValue } from "firebase/database";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDBBAUN25T6PRPo6wFiBzSP2KC-fyeR6kY",
-  authDomain: "rtc-vizag-tracker.firebaseapp.com",
-  databaseURL: "https://rtc-vizag-tracker-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "rtc-vizag-tracker",
-  storageBucket: "rtc-vizag-tracker.firebasestorage.app",
-  messagingSenderId: "185598594824",
-  appId: "1:185598594824:web:67ca8e7518d434729a66bd"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
 const app = initializeApp(firebaseConfig);

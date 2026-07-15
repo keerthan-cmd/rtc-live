@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-
-export default function AIChatWidget() {
+import ROUTES_DATA from './data/routes_data.json';
+export default function AIChatWidget({ incomingBuses = [], nearbyBuses = [] }) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     { text: "Hello! I am your local AI Transit Assistant. How can I help you plan your journey today?", sender: "ai" }
@@ -10,18 +10,21 @@ export default function AIChatWidget() {
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const messagesEndRef = useRef(null);
+  const recognitionRef = useRef(null);
 
-  // Setup Speech Recognition
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const recognition = SpeechRecognition ? new SpeechRecognition() : null;
-  
-  if (recognition) {
-    recognition.continuous = false;
-    recognition.lang = 'en-US';
-    recognition.interimResults = false;
-  }
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition && !recognitionRef.current) {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+      recognitionRef.current = recognition;
+    }
+  }, []);
 
   const toggleListen = () => {
+    const recognition = recognitionRef.current;
     if (isListening) {
       recognition?.stop();
       setIsListening(false);
@@ -52,60 +55,92 @@ export default function AIChatWidget() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  const processChat = (userMsg) => {
+    const msg = userMsg.toLowerCase();
+    let reply = "I'm sorry, I couldn't quite understand that. Could you try rephrasing your question with specific bus stops or route numbers?";
+
+    if (msg.match(/\b(hi|hello|hey|greetings)\b/)) return "Hello! How can I help you with your journey today?";
+    
+    if (incomingBuses && incomingBuses.length > 0) {
+      const bestBus = incomingBuses[0];
+      if (msg.match(/\b(time|when|eta|coming|long|wait|arrive|arriving)\b/)) {
+        return `Your bus on route ${bestBus.routeId || 'Unknown'} is currently ${bestBus.dist?.toFixed(1) || 0} km away. It will arrive in approximately ${bestBus.etaMins || 0} minutes.`;
+      }
+      if (msg.match(/\b(fare|cost|price|ticket|much)\b/)) {
+        return `The fare for your current route ${bestBus.routeId} typically ranges from ₹10 - ₹40.`;
+      }
+    }
+                    
+    if (nearbyBuses && nearbyBuses.length > 0 && msg.match(/\b(near|around|close|nearby)\b/)) {
+      const routesNear = [...new Set(nearbyBuses.map(b => b.routeId).filter(Boolean))];
+      if (routesNear.length > 0) return `I see buses on routes ${routesNear.join(', ')} currently near your location. You can select one on the map to track it.`;
+    }
+
+    let foundRouteId = null;
+    for (const rid of Object.keys(ROUTES_DATA)) {
+      if (msg.split(/\s+/).includes(rid.toLowerCase())) {
+        foundRouteId = rid; break;
+      }
+    }
+            
+    if (foundRouteId) {
+      const stops = ROUTES_DATA[foundRouteId] || [];
+      if (msg.match(/\b(time|when|first|last|frequency|schedule)\b/)) {
+        return `Route ${foundRouteId} runs every 20 mins from 06:00 AM to 09:00 PM.`;
+      } else if (msg.match(/\b(fare|cost|price|ticket|much)\b/)) {
+        return `The fare for route ${foundRouteId} typically ranges from ₹10 - ₹40.`;
+      } else if (msg.match(/\b(stop|where|path|via)\b/)) {
+        return `Route ${foundRouteId} stops at: ${stops.join(", ")}.`;
+      } else {
+        return `Route ${foundRouteId} runs every 20 mins. Stops include: ${stops.slice(0, 4).join(', ')}...`;
+      }
+    }
+
+    const mentionedStops = [];
+    const allStops = [...new Set(Object.values(ROUTES_DATA).flat())];
+    for (const stop of allStops) {
+      if (stop.length > 3 && msg.includes(stop.toLowerCase())) mentionedStops.push(stop);
+    }
+    
+    if (mentionedStops.length >= 2) {
+      const validRoutes = [];
+      for (const [rid, stops] of Object.entries(ROUTES_DATA)) {
+        if (stops.includes(mentionedStops[0]) && stops.includes(mentionedStops[1])) validRoutes.push(rid);
+      }
+      if (validRoutes.length > 0) return `To travel between ${mentionedStops[0]} and ${mentionedStops[1]}, take Route(s): ${validRoutes.join(', ')}.`;
+      else return `I couldn't find a direct bus route connecting ${mentionedStops[0]} and ${mentionedStops[1]}.`;
+    } else if (mentionedStops.length === 1) {
+      const validRoutes = [];
+      for (const [rid, stops] of Object.entries(ROUTES_DATA)) {
+        if (stops.includes(mentionedStops[0])) validRoutes.push(rid);
+      }
+      if (validRoutes.length > 0) return `Buses that stop at ${mentionedStops[0]}: ${validRoutes.join(', ')}.`;
+    }
+    
+    if (msg.match(/\b(help|support)\b/)) return "I can help you find bus routes, timings, and fares. Just ask something like 'What stops are on 10A?'";
+    return reply;
+  };
+
   const handleQuickAction = async (action) => {
     setMessages(prev => [...prev, { text: action.label, sender: "user" }]);
     setIsAiLoading(true);
-
-    try {
-      const apiUrl = `https://ai-snowy-alpha.vercel.app/chat`;
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: action.route })
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        setMessages(prev => [...prev, { text: data.reply, sender: "ai" }]);
-      } else {
-        throw new Error('Local API not responding properly.');
-      }
-    } catch (err) {
-      setMessages(prev => [...prev, { text: `Error: ${err.message}. Failed to reach the cloud server.`, sender: "ai" }]);
-    }
-    setIsAiLoading(false);
+    setTimeout(() => {
+      setMessages(prev => [...prev, { text: processChat(action.route), sender: "ai" }]);
+      setIsAiLoading(false);
+    }, 600);
   };
 
   const handleSend = async () => {
     if (!input.trim()) return;
-    
     const userMsg = input;
     setMessages(prev => [...prev, { text: userMsg, sender: "user" }]);
     setInput("");
     setIsTyping(true);
-
-    try {
-      const apiUrl = `https://ai-snowy-alpha.vercel.app/chat`;
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMsg })
-      });
-
-      if (!response.ok) {
-        throw new Error("Local API error");
-      }
-      
-      const data = await response.json();
-      if (data.reply) {
-        setMessages(prev => [...prev, { text: data.reply, sender: "ai" }]);
-      } else {
-        throw new Error("Invalid response structure from local API");
-      }
-    } catch (error) {
-      setMessages(prev => [...prev, { text: `API Rejection: ${error.message}. Failed to reach the cloud server.`, sender: "ai" }]);
-    }
-    setIsTyping(false);
+    
+    setTimeout(() => {
+      setMessages(prev => [...prev, { text: processChat(userMsg), sender: "ai" }]);
+      setIsTyping(false);
+    }, 800);
   };
 
   return (

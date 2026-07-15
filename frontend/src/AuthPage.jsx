@@ -8,6 +8,7 @@ export default function AuthPage({ requestedView, onLogin, onSignUp, onForgotPas
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (requestedView) setMode(requestedView);
   }, [requestedView]);
 

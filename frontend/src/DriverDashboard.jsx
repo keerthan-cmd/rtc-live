@@ -29,28 +29,40 @@ function MapUpdater({ center }) {
 }
 
 export default function DriverDashboard() {
-  const [busId, setBusId] = useState("");
-  const [routeId, setRouteId] = useState("");
-  const [isTracking, setIsTracking] = useState(false);
-  const [useMockGps, setUseMockGps] = useState(false);
+  const [busId, setBusId] = useState(() => localStorage.getItem("rtc_busId") || "");
+  const [routeId, setRouteId] = useState(() => localStorage.getItem("rtc_routeId") || "");
+  const [isTracking, setIsTracking] = useState(() => localStorage.getItem("rtc_isTracking") === "true");
+  const [useMockGps, setUseMockGps] = useState(() => localStorage.getItem("rtc_useMockGps") === "true");
   const [currentLoc, setCurrentLoc] = useState([17.7285, 83.2573]);
   const [gpsError, setGpsError] = useState("");
-  const [isEmergency, setIsEmergency] = useState(false);
-  const [occupancy, setOccupancy] = useState("Moderate");
+  const [isEmergency, setIsEmergency] = useState(() => localStorage.getItem("rtc_isEmergency") === "true");
+  const [occupancy, setOccupancy] = useState(() => localStorage.getItem("rtc_occupancy") || "Moderate");
   const navigate = useNavigate();
 
-  const mockState = useRef({ segment: 0, fraction: 0, dir: 1, speed: 0.05 });
-  const isEmergencyRef = useRef(false);
-  const occupancyRef = useRef("Moderate");
+  const savedMockState = localStorage.getItem("rtc_mockState");
+  const initialMockState = savedMockState ? JSON.parse(savedMockState) : { segment: 0, fraction: 0, dir: 1, speed: 0.15 };
+  const mockState = useRef(initialMockState);
+  
+  const isEmergencyRef = useRef(isEmergency);
+  const occupancyRef = useRef(occupancy);
 
   // Sync state to ref for intervals
   useEffect(() => {
     isEmergencyRef.current = isEmergency;
+    localStorage.setItem("rtc_isEmergency", isEmergency);
   }, [isEmergency]);
   
   useEffect(() => {
     occupancyRef.current = occupancy;
+    localStorage.setItem("rtc_occupancy", occupancy);
   }, [occupancy]);
+
+  useEffect(() => {
+    localStorage.setItem("rtc_busId", busId);
+    localStorage.setItem("rtc_routeId", routeId);
+    localStorage.setItem("rtc_isTracking", isTracking);
+    localStorage.setItem("rtc_useMockGps", useMockGps);
+  }, [busId, routeId, isTracking, useMockGps]);
 
   const handleLogout = () => {
     localStorage.removeItem("rtc_session");
@@ -60,8 +72,10 @@ export default function DriverDashboard() {
   useEffect(() => {
     let watchId = null;
     let mockInterval = null;
+    let isLocUnmounted = false;
 
     if (isTracking && busId && routeId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setGpsError("");
 
       if (useMockGps) {
@@ -73,13 +87,13 @@ export default function DriverDashboard() {
         }
         
         const baseStops = stopNames.map(name => STOPS_DATA[name]).filter(Boolean);
-        let isUnmounted = false;
+        isLocUnmounted = false;
         
         const coordsString = baseStops.map(p => `${p[1]},${p[0]}`).join(';');
         fetch(`https://router.project-osrm.org/route/v1/driving/${coordsString}?overview=full&geometries=geojson`)
           .then(res => res.json())
           .then(data => {
-            if (isUnmounted) return;
+            if (isLocUnmounted) return;
             let finalPath = baseStops;
             if (data.routes && data.routes.length > 0) {
               finalPath = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
@@ -87,11 +101,13 @@ export default function DriverDashboard() {
             startMockInterval(finalPath);
           })
           .catch(() => {
-            if (!isUnmounted) startMockInterval(baseStops);
+            if (!isLocUnmounted) startMockInterval(baseStops);
           });
 
         function startMockInterval(finalPath) {
-          mockState.current = { segment: 0, fraction: 0, dir: 1, speed: 0.15 }; 
+          if (mockState.current.segment >= finalPath.length - 1) {
+            mockState.current = { segment: 0, fraction: 0, dir: 1, speed: 0.15 };
+          }
           
           mockInterval = setInterval(() => {
             let s = mockState.current;
@@ -120,6 +136,7 @@ export default function DriverDashboard() {
             if (p1 && p2) {
               const loc = getInterpolatedPoint(p1, p2, s.fraction);
               setCurrentLoc(loc);
+              localStorage.setItem("rtc_mockState", JSON.stringify(s));
               
               set(ref(database, `buses/${busId}`), { 
                 lat: loc[0], 
@@ -143,40 +160,47 @@ export default function DriverDashboard() {
           return; 
         }
 
-        watchId = navigator.geolocation.watchPosition(
-          (position) => {
-            const loc = [position.coords.latitude, position.coords.longitude];
-            setCurrentLoc(loc);
-            setGpsError("");
-            
-            set(ref(database, `buses/${busId}`), { 
-              lat: loc[0], 
-              lng: loc[1], 
-              lastUpdated: Date.now(), 
-              status: isEmergencyRef.current ? "Emergency" : "On Route",
-              routeId: routeId,
-              speed: 0.04, 
-              dir: 1,
-              alert: isEmergencyRef.current,
-              occupancy: occupancyRef.current
-            });
-          },
-          (error) => { 
-            console.error("Geolocation Error:", error); 
-            setGpsError(`Location error (${error.code}): ${error.message}`); 
-            setIsTracking(false); 
-          },
-          { enableHighAccuracy: true, maximumAge: 0 } 
-        );
+        let isLocUnmounted = false;
+        const fetchLocation = () => {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              if (isLocUnmounted) return;
+              const loc = [position.coords.latitude, position.coords.longitude];
+              setCurrentLoc(loc);
+              setGpsError("");
+              
+              set(ref(database, `buses/${busId}`), { 
+                lat: loc[0], 
+                lng: loc[1], 
+                lastUpdated: Date.now(), 
+                status: isEmergencyRef.current ? "Emergency" : "On Route",
+                routeId: routeId,
+                speed: 0.04, 
+                dir: 1,
+                alert: isEmergencyRef.current,
+                occupancy: occupancyRef.current
+              });
+            },
+            (error) => { 
+              if (isLocUnmounted) return;
+              console.error("Geolocation Error:", error); 
+              setGpsError(`Location error (${error.code}): ${error.message}`); 
+            },
+            { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 } 
+          );
+        };
+        fetchLocation();
+        mockInterval = setInterval(fetchLocation, 2000);
+        watchId = () => { isLocUnmounted = true; }; // Dummy cleanup for watchId
       }
-
     } else if (!isTracking && busId) {
         set(ref(database, `buses/${busId}`), null);
     }
 
     return () => { 
-      if (typeof isUnmounted !== 'undefined') isUnmounted = true;
-      if (watchId !== null) navigator.geolocation.clearWatch(watchId); 
+      isLocUnmounted = true;
+      if (typeof watchId === 'function') watchId(); 
+      else if (watchId !== null) navigator.geolocation.clearWatch(watchId); 
       if (mockInterval !== null) clearInterval(mockInterval);
     };
   }, [isTracking, busId, routeId, useMockGps]);
@@ -353,7 +377,10 @@ export default function DriverDashboard() {
       <main className="fullscreen-map">
         <MapContainer center={currentLoc} zoom={15} style={{ width: '100%', height: '100%' }} zoomControl={false}>
           <MapUpdater center={currentLoc} />
-          <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" />
+          <TileLayer 
+            url="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}" 
+            attribution="&copy; Google Maps"
+          />
           <Marker position={currentLoc} icon={busIcon}>
             <Popup>You are here</Popup>
           </Marker>

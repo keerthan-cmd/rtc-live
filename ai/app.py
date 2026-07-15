@@ -80,6 +80,12 @@ def chat():
     if not message:
         return jsonify({"reply": "Please ask me something."})
 
+    context = data.get("context", {})
+    incoming_buses = context.get("incomingBuses", [])
+    nearby_buses = context.get("nearbyBuses", [])
+    boarding = context.get("boardingPoint", "")
+    destination = context.get("destination", "")
+
     routes = routes_data.get("routes", [])
     bot_responses = routes_data.get("bot_responses", {})
     
@@ -92,6 +98,26 @@ def chat():
     # 1. GREETING intent
     if re.search(r'^\b(hi|hello|hey|greetings)\b', message):
         return jsonify({"reply": bot_responses.get("greeting", "Hello! How can I help you with your journey today?")})
+        
+    # 1.5 LIVE TRACKING & CONTEXT AWARE INTENT
+    if incoming_buses:
+        best_bus = incoming_buses[0]
+        if re.search(r'\b(time|when|eta|coming|long|wait|arrive|arriving)\b', message):
+            reply = f"Your bus on route {best_bus.get('routeId', 'Unknown')} is currently {best_bus.get('dist', 0):.1f} km away. It will arrive in approximately {best_bus.get('etaMins', 0)} minutes."
+            return jsonify({"reply": reply})
+        if re.search(r'\b(fare|cost|price|ticket|much)\b', message):
+            for r in routes:
+                if r["id"] == best_bus.get("routeId"):
+                    reply = f"The fare for your current route {r['id']} ({boarding} to {destination}) typically ranges from {r['fare_range']}."
+                    return jsonify({"reply": reply})
+                    
+    if nearby_buses and re.search(r'\b(near|around|close|nearby)\b', message):
+        routes_near = list(set([b.get("routeId") for b in nearby_buses if b.get("routeId")]))
+        if routes_near:
+            reply = f"I see buses on routes {', '.join(routes_near)} currently near your location. You can select one on the map to track it."
+        else:
+            reply = "There are currently no active buses very close to your location."
+        return jsonify({"reply": reply})
     
     # 2. Identify if a specific Route ID was mentioned
     found_route = None
@@ -134,7 +160,7 @@ def chat():
     for ngram in ngrams:
         for stop_key in all_stops_lower.keys():
             # 1. Exact Substring Match (handles "duvvada" in "duvvada railway station")
-            if len(ngram) >= 4 and ngram in stop_key:
+            if len(ngram) >= 3 and ngram in stop_key:
                 mentioned_stops.add(all_stops_lower[stop_key])
             
             # 2. Fuzzy Match on the entire stop name
@@ -144,7 +170,7 @@ def chat():
             # 3. Fuzzy Match on individual words of the stop (handles "duvada" in "duvvada railway station")
             else:
                 stop_words = stop_key.split()
-                if len(ngram.split()) == 1 and len(ngram) >= 4:
+                if len(ngram.split()) == 1 and len(ngram) >= 3:
                     word_matches = difflib.get_close_matches(ngram, stop_words, n=1, cutoff=0.80)
                     if word_matches:
                         mentioned_stops.add(all_stops_lower[stop_key])

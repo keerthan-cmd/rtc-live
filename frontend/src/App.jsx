@@ -3,10 +3,8 @@ import { HashRouter as Router, Routes, Route, useNavigate } from "react-router-d
 import emailjs from '@emailjs/browser';
 import { database } from "./firebase"; 
 import { ref, set, onValue, get, child } from "firebase/database";
-import MapComponent from "./MapComponent"; 
 import AuthPage from "./AuthPage";
 import OTPPage from "./OTPPage";
-import AIChatWidget from "./AIChatWidget";
 import appLogo from "./logo.png";
 import UserDashboard from "./UserDashboard";
 import DriverDashboard from "./DriverDashboard";
@@ -50,9 +48,9 @@ function AuthFlow() {
   const [forceView, setForceView] = useState("login"); 
   const navigate = useNavigate();
 
-  const EMAILJS_SERVICE_ID = "service_057l2cf";
-  const EMAILJS_TEMPLATE_ID = "template_1wigsc6";
-  const EMAILJS_PUBLIC_KEY = "LIuoaP_pa9oJuofG9";
+  const EMAILJS_SERVICE_ID = "service_ptdw81u";
+  const EMAILJS_TEMPLATE_ID = "template_p59ei6h";
+  const EMAILJS_PUBLIC_KEY = "7b6J029zSFh5lvWQ8";
 
   useEffect(() => {
     const savedSession = localStorage.getItem("rtc_session");
@@ -83,7 +81,7 @@ function AuthFlow() {
           alert("Incorrect password.");
         }
       }
-    } catch (error) {
+    } catch {
       alert("System error during login.");
     }
     setIsProcessing(false);
@@ -106,7 +104,7 @@ function AuthFlow() {
         localStorage.setItem("rtc_session", JSON.stringify({ role: data.role, email: data.email, timestamp: Date.now() }));
         navigate(`/${data.role.toLowerCase()}`);
       }
-    } catch (error) {
+    } catch {
       alert("Error creating account.");
     }
     setIsProcessing(false);
@@ -130,20 +128,18 @@ function AuthFlow() {
       const generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
       await set(ref(database, `temporary_otps/${safeEmail}`), { code: generatedOTP, timestamp: Date.now() });
       
-      console.log(`%c 🚨 DEV OVERRIDE - YOUR OTP IS: ${generatedOTP}`, 'color: #10b981; font-size: 16px; font-weight: bold;');
-
       // 3. Try to email the user, but don't break if EmailJS blocks it
       try {
         await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, { to_email: data.email, otp_code: generatedOTP }, EMAILJS_PUBLIC_KEY);
       } catch (emailError) {
-        console.warn("Email limits reached. OTP provided in console instead.");
-        alert("Email server limit reached! Press F12 to open your browser Developer Console and find your 6-digit OTP code.");
+        console.error("EmailJS Full Error:", emailError);
+        alert(`Email system error: ${emailError?.text || emailError?.message || "Unknown API rejection"}\nPlease check your EmailJS dashboard setup.`);
       }
 
       setAuthData({ email: data.email, role: data.role });
       setStep("otp");
 
-    } catch (error) {
+    } catch {
       alert("Database error. Please check your connection.");
     }
     setIsProcessing(false);
@@ -160,7 +156,7 @@ function AuthFlow() {
       } else {
         alert("Invalid or expired OTP.");
       }
-    } catch (error) {
+    } catch {
       alert("Error verifying code.");
     }
     setIsProcessing(false);
@@ -175,7 +171,7 @@ function AuthFlow() {
       alert("Password updated! You can now log in.");
       setStep("auth");
       setForceView("login");
-    } catch (error) {
+    } catch {
       alert("Error updating password.");
     }
     setIsProcessing(false);
@@ -309,7 +305,7 @@ function AdminDashboard() {
     return () => unsubscribe(); 
   }, []);
 
-  const [currentTime, setCurrentTime] = useState(Date.now());
+  const [currentTime, setCurrentTime] = useState(() => Date.now());
   useEffect(() => {
     const interval = setInterval(() => setCurrentTime(Date.now()), 5000);
     return () => clearInterval(interval);
@@ -527,7 +523,10 @@ function AdminDashboard() {
 
       <main className="fullscreen-map">
         <MapContainer center={vizagCenter} zoom={13} style={{ width: '100%', height: '100%' }} zoomControl={true}>
-          <TileLayer url={isDarkMode ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"} />
+          <TileLayer 
+            url={isDarkMode ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" : "https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"} 
+            attribution="&copy; Google Maps"
+          />
           {Object.entries(activeBuses).map(([bus, data]) => (
             <Marker key={bus} position={[data.lat, data.lng]} icon={data.alert ? emergencyBusIcon : adminBusIcon}>
               <Popup>

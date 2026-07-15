@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-export default function OTPPage({ email, role, onVerify, onGoBack }) {
+export default function OTPPage({ email, onVerify, onGoBack }) {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [timeLeft, setTimeLeft] = useState(55);
   const inputRefs = useRef([]);
@@ -159,13 +159,14 @@ export default function OTPPage({ email, role, onVerify, onGoBack }) {
 
         .otp-container {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             gap: 6px;
             width: 100%;
         }
 
         .otp-box {
-            width: 38px;
+            flex: 1;
+            max-width: 38px;
             height: 48px;
             border: 1px solid #cbd5e1;
             border-radius: 8px;

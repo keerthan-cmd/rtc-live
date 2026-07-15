@@ -1,6 +1,6 @@
 import { database, ref, set } from './firebase.js';
-import STOPS_DATA from './data/stops.json' assert { type: "json" };
-import ROUTES_DATA from './data/routes_data.json' assert { type: "json" };
+import STOPS_DATA from './data/stops.json' with { type: "json" };
+import ROUTES_DATA from './data/routes_data.json' with { type: "json" };
 
 // Interpolate between points to make smooth movement
 function getInterpolatedPoint(p1, p2, fraction) {
@@ -79,5 +79,6 @@ setInterval(() => {
       });
     }
   });
+  // eslint-disable-next-line no-undef
   process.stdout.write(".");
 }, 2000); // Update every 2 seconds

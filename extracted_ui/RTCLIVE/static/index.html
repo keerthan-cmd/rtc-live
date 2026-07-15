@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RTC LIVE - Premium Tracking</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+    <div class="app-wrapper">
+        <aside class="sidebar-container">
+            <div class="main-sidebar">
+                <div class="brand"><h2>RTC</h2><span>LIVE</span></div>
+                <nav class="nav-menu">
+                    <button class="nav-btn active" onclick="openSlidePanel('near-me-panel', this)"><i class="fa-solid fa-location-crosshairs"></i><span>Near Me</span></button>
+                    <button class="nav-btn" onclick="openSlidePanel('between-locations-panel', this)"><i class="fa-solid fa-route"></i><span>Routes</span></button>
+                    <button class="nav-btn" onclick="openSlidePanel('live-gps-panel', this)"><i class="fa-solid fa-bus"></i><span>Track Live</span></button>
+                    <button class="nav-btn" onclick="openSlidePanel('favorites-panel', this)"><i class="fa-solid fa-star"></i><span>Favourites</span></button>
+                </nav>
+            </div>
+
+            <div class="slide-panels">
+                <!-- Panel 1: Near Me (Cleaned up, focus on ETA & Routing) -->
+                <div id="near-me-panel" class="panel-content active">
+                    <h2>Nearby Stations</h2>
+                    <p class="panel-desc">Select transport mode and click a station to calculate your exact travel route.</p>
+                    <div class="transport-modes">
+                        <button class="mode-btn active" onclick="setTransportMode('foot', this)"><i class="fa-solid fa-person-walking"></i> Walk</button>
+                        <button class="mode-btn" onclick="setTransportMode('bike', this)"><i class="fa-solid fa-bicycle"></i> Bike</button>
+                        <button class="mode-btn" onclick="setTransportMode('driving', this)"><i class="fa-solid fa-car"></i> Car</button>
+                    </div>
+                    <div id="near-me-results" class="results-list" style="margin-top:15px;"></div>
+                </div>
+
+                <!-- Panel 2: Routes (Now with Bus Type Filter) -->
+                <div id="between-locations-panel" class="panel-content">
+                    <h2>Find Buses</h2>
+                    <div class="input-group">
+                        <label><i class="fa-solid fa-circle-dot" style="color: green;"></i> Current Stop</label>
+                        <input type="text" id="from-stop-input" placeholder="e.g., Gajuwaka">
+                    </div>
+                    <div class="input-group">
+                        <label><i class="fa-solid fa-location-dot" style="color: var(--rtc-red);"></i> Destination Stop</label>
+                        <input type="text" id="to-stop-input" placeholder="e.g., RTC Complex">
+                    </div>
+                    <div class="input-group">
+                        <label><i class="fa-solid fa-bus-simple"></i> Service Type</label>
+                        <select id="bus-type-input" class="modern-select">
+                            <option value="All">All Types</option>
+                            <option value="City Ordinary">City Ordinary (Red)</option>
+                            <option value="Metro Express">Metro Express (Blue)</option>
+                            <option value="Metro Luxury">Metro Luxury (Green)</option>
+                        </select>
+                    </div>
+                    <button class="action-btn" onclick="executeRouteSearch()">Search Fleet</button>
+                    <div id="between-results" class="results-list" style="margin-top: 15px;"></div>
+                </div>
+
+                <!-- Panel 3: Professional Live Tracking -->
+                <div id="live-gps-panel" class="panel-content">
+                    <h2>Live Telemetry</h2>
+                    <div class="search-box-row">
+                        <input type="text" id="target-route-id" placeholder="Enter Route (e.g., 38Y)">
+                        <button onclick="searchRouteVariants()"><i class="fa-solid fa-magnifying-glass"></i></button>
+                    </div>
+                    <div id="route-variants-panel" class="results-list" style="margin-top:15px;"></div>
+                    <div id="live-tracking-data-panel"></div>
+                </div>
+
+                <!-- Panel 4: Favorites Hub (Sleek UI) -->
+                <div id="favorites-panel" class="panel-content">
+                    <h2>Quick Actions</h2>
+                    <p class="panel-desc">One-tap tracking for your daily commutes.</p>
+                    <div class="results-list">
+                        <div class="slide-card-item fav-card" onclick="document.getElementById('target-route-id').value='38Y'; searchRouteVariants(); openSlidePanel('live-gps-panel', document.querySelectorAll('.nav-btn')[2]);">
+                            <div class="fav-icon-box" style="background:#0087FF;"><i class="fa-solid fa-briefcase"></i></div>
+                            <div class="card-meta"><h4>Home to Work</h4><p>Route 38Y • Metro Express</p></div>
+                            <i class="fa-solid fa-chevron-right text-muted"></i>
+                        </div>
+                        <div class="slide-card-item fav-card" onclick="document.getElementById('target-route-id').value='600'; searchRouteVariants(); openSlidePanel('live-gps-panel', document.querySelectorAll('.nav-btn')[2]);">
+                            <div class="fav-icon-box" style="background:var(--rtc-red);"><i class="fa-solid fa-cart-shopping"></i></div>
+                            <div class="card-meta"><h4>Market Trip</h4><p>Route 600 • City Ordinary</p></div>
+                            <i class="fa-solid fa-chevron-right text-muted"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        <main id="map" class="fullscreen-map"></main>
+    </div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
