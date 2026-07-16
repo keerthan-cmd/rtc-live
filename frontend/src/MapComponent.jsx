@@ -93,10 +93,21 @@ function RecenterButton({ center, zoom, bounds }) {
   const map = useMap();
   const handleRecenter = (e) => {
     e.stopPropagation();
-    if (bounds) {
-      map.fitBounds(bounds, { padding: [50, 50], animate: true });
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          map.setView([position.coords.latitude, position.coords.longitude], 15, { animate: true });
+        },
+        (error) => {
+          console.warn("Recenter error:", error);
+          if (bounds) map.fitBounds(bounds, { padding: [50, 50], animate: true });
+          else map.setView(center, zoom, { animate: true });
+        },
+        { enableHighAccuracy: true, timeout: 5000 }
+      );
     } else {
-      map.setView(center, zoom, { animate: true });
+      if (bounds) map.fitBounds(bounds, { padding: [50, 50], animate: true });
+      else map.setView(center, zoom, { animate: true });
     }
   };
 
@@ -281,7 +292,7 @@ export default function MapComponent({ boardingPoint, destination, routeConfirme
         zoomControl={false}
       >
         <MapUpdater center={mapCenter} zoom={13} bounds={mapBounds} />
-        <RecenterButton center={mapCenter} zoom={13} bounds={mapBounds} />
+        <RecenterButton center={userLocation || mapCenter} zoom={userLocation ? 15 : 13} bounds={userLocation ? null : mapBounds} />
         
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

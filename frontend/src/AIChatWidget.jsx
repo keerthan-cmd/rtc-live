@@ -144,14 +144,33 @@ export default function AIChatWidget({ incomingBuses = [], nearbyBuses = [] }) {
   };
 
   return (
-    <div style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 9999, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+    <div className="chat-widget-container" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+      <style>{`
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .chat-widget-container {
+          position: fixed;
+          bottom: 24px;
+          right: 24px;
+          z-index: 9999;
+        }
+        @media (max-width: 768px) {
+          .chat-widget-container {
+            bottom: calc(50vh + 24px); /* Move above the 50vh bottom panel */
+          }
+        }
+      `}</style>
       
       {isOpen && (
         <div style={{ 
           backgroundColor: 'rgba(255, 255, 255, 0.95)', 
           backdropFilter: 'blur(16px)',
           WebkitBackdropFilter: 'blur(16px)',
-          width: '350px', height: '500px', borderRadius: '24px', 
+          width: '350px',
+          maxWidth: 'calc(100vw - 48px)',
+          height: '500px',
+          maxHeight: 'calc(100vh - 100px)', borderRadius: '24px', 
           boxShadow: '0 20px 40px rgba(0,0,0,0.15)', display: 'flex', flexDirection: 'column',
           marginBottom: '20px', overflow: 'hidden', border: '1px solid rgba(0,0,0,0.05)',
           animation: 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
@@ -230,10 +249,6 @@ export default function AIChatWidget({ incomingBuses = [], nearbyBuses = [] }) {
               </button>
             </div>
           </div>
-          <style>{`
-            @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
-            @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-          `}</style>
         </div>
       )}
 

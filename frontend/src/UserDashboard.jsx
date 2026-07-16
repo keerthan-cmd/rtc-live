@@ -4,7 +4,7 @@ import AIChatWidget from "./AIChatWidget";
 import STOPS_DATA from "./data/stops.json";
 import STOPS_TE from "./data/stops_te.json";
 import ROUTES_DATA from "./data/routes_data.json";
-import { database, ref, onValue } from "./firebase";
+import { database, ref, onValue, push, set } from "./firebase";
 
 function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
   const R = 6371; 
@@ -83,7 +83,8 @@ export default function UserDashboard({ onLogout }) {
           },
           () => {
             setLocationError("Unable to retrieve location.");
-          }
+          },
+          { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
         );
       } else {
         // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -136,7 +137,8 @@ export default function UserDashboard({ onLogout }) {
         },
         () => {
           alert("SOS Alert dispatched! (Unable to attach location)");
-        }
+        },
+        { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
       );
     } else {
       alert("SOS Alert dispatched! (Geolocation not supported)");
@@ -146,11 +148,18 @@ export default function UserDashboard({ onLogout }) {
   const handleFeedbackSubmit = () => {
     if (!feedbackText) return;
     setFeedbackStatus('Submitting...');
-    setTimeout(() => {
+    const suggestionsRef = ref(database, 'suggestions');
+    const newSuggestionRef = push(suggestionsRef);
+    set(newSuggestionRef, {
+      text: feedbackText,
+      timestamp: Date.now()
+    }).then(() => {
       setFeedbackStatus('Thank you for your feedback!');
       setFeedbackText('');
       setTimeout(() => setFeedbackStatus(''), 3000);
-    }, 1000);
+    }).catch(() => {
+      setFeedbackStatus('Failed to submit. Please try again.');
+    });
   };
 
   // Calculate incoming buses dynamically
@@ -229,7 +238,8 @@ export default function UserDashboard({ onLogout }) {
         .app-wrapper { display: flex; width: 100vw; height: 100vh; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: var(--text-main); background: var(--off-white); overflow: hidden; }
         
         .sidebar-container { display: flex; width: 480px; height: 100%; background: var(--clean-white); border-right: 1px solid var(--border-color); z-index: 10; box-shadow: 4px 0 25px rgba(0,0,0,0.05); }
-        .main-sidebar { width: 90px; height: 100%; background: var(--rtc-black); display: flex; flex-direction: column; align-items: center; padding: 20px 0; }
+        .main-sidebar { width: 90px; height: 100%; background: var(--rtc-black); display: flex; flex-direction: column; align-items: center; padding: 20px 0; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; -ms-overflow-style: none; }
+        .main-sidebar::-webkit-scrollbar { display: none; }
         
         .brand h2 { color: var(--clean-white); font-size: 1.4rem; font-weight: 800; text-align: center; }
         .brand span { color: var(--rtc-red); font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; display: block; text-align: center; }
@@ -240,7 +250,7 @@ export default function UserDashboard({ onLogout }) {
         .nav-btn span { font-size: 0.7rem; font-weight: 600; }
         .nav-btn:hover, .nav-btn.active { color: var(--clean-white); background: rgba(255, 255, 255, 0.05); border-left: 4px solid var(--rtc-red); }
         
-        .slide-panels { flex: 1; padding: 30px 20px; background: var(--clean-white); overflow-y: auto; overflow-x: hidden; }
+        .slide-panels { flex: 1; padding: 30px 20px; background: var(--clean-white); overflow-y: auto; overflow-x: hidden; min-height: 0; }
         .slide-panels::-webkit-scrollbar { width: 6px; }
         .slide-panels::-webkit-scrollbar-track { background: var(--off-white); }
         .slide-panels::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
@@ -274,7 +284,7 @@ export default function UserDashboard({ onLogout }) {
         @media (max-width: 768px) {
             .app-wrapper { flex-direction: column-reverse; }
             .sidebar-container { width: 100%; height: 50vh; flex-direction: column; }
-            .main-sidebar { width: 100%; height: auto; flex-direction: row; padding: 10px; justify-content: space-around; }
+            .main-sidebar { width: 100%; height: auto; flex-direction: row; padding: 10px; justify-content: space-around; overflow-x: auto; overflow-y: hidden; }
             .nav-menu { flex-direction: row; margin-top: 0; justify-content: space-around; gap: 5px; }
             .nav-btn { padding: 10px; }
             .nav-btn i { font-size: 18px; }

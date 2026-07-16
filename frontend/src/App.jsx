@@ -62,10 +62,35 @@ function AuthFlow() {
 
   const sanitizeEmail = (email) => email.replace(/\./g, ',');
 
+  const checkIsAllowedAdmin = async (email, safeEmail) => {
+    try {
+      const snap = await get(child(ref(database), `allowed_admins`));
+      if (!snap.exists()) return false;
+      const data = snap.val();
+      if (Array.isArray(data)) return data.includes(email);
+      const keys = Object.keys(data);
+      const values = Object.values(data);
+      return keys.includes(safeEmail) || values.includes(email);
+    } catch (e) {
+      console.error("Error checking allowed_admins:", e);
+      return false;
+    }
+  };
+
   const handleLogin = async (data) => {
     if (!data.email || !data.password) return alert("Please provide email and password.");
+    
     setIsProcessing(true);
     const safeEmail = sanitizeEmail(data.email);
+
+    // Admin RBAC Check (Firebase Dynamic Node)
+    if (data.role === "Admin") {
+      const isAllowed = await checkIsAllowedAdmin(data.email.toLowerCase(), safeEmail);
+      if (!isAllowed) {
+        setIsProcessing(false);
+        return alert("Unauthorized: This email is not in the Firebase allowed admins node.");
+      }
+    }
     
     try {
       const accountSnapshot = await get(child(ref(database), `accounts/${data.role}/${safeEmail}`));
@@ -89,8 +114,18 @@ function AuthFlow() {
 
   const handleSignUp = async (data) => {
     if (!data.email || !data.password) return alert("Please fill out all fields.");
+    
     setIsProcessing(true);
     const safeEmail = sanitizeEmail(data.email);
+
+    // Admin RBAC Check (Firebase Dynamic Node)
+    if (data.role === "Admin") {
+      const isAllowed = await checkIsAllowedAdmin(data.email.toLowerCase(), safeEmail);
+      if (!isAllowed) {
+        setIsProcessing(false);
+        return alert("Unauthorized: You cannot create an Admin account with this email. It is not in Firebase allowed_admins.");
+      }
+    }
     
     try {
       const accountSnapshot = await get(child(ref(database), `accounts/${data.role}/${safeEmail}`));
@@ -243,6 +278,7 @@ const emergencyBusIcon = new L.divIcon({
 function AdminDashboard() {
   const [activeBuses, setActiveBuses] = useState({});
   const [activePanel, setActivePanel] = useState('fleet');
+  const [suggestions, setSuggestions] = useState({});
   
   // Settings State
   const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
@@ -305,6 +341,13 @@ function AdminDashboard() {
     return () => unsubscribe(); 
   }, []);
 
+  useEffect(() => {
+    const unsubscribe = onValue(ref(database, 'suggestions'), (snapshot) => {
+      setSuggestions(snapshot.val() || {});
+    });
+    return () => unsubscribe();
+  }, []);
+
   const [currentTime, setCurrentTime] = useState(() => Date.now());
   useEffect(() => {
     const interval = setInterval(() => setCurrentTime(Date.now()), 5000);
@@ -351,7 +394,8 @@ function AdminDashboard() {
         .app-wrapper { display: flex; width: 100vw; height: 100vh; color: var(--text-main); overflow: hidden; background: var(--off-white); }
         
         .sidebar-container { display: flex; width: 480px; height: 100%; background: var(--clean-white); border-right: 1px solid var(--border-color); z-index: 10; box-shadow: 4px 0 25px rgba(0,0,0,0.05); }
-        .main-sidebar { width: 90px; height: 100%; background: var(--rtc-black); display: flex; flex-direction: column; align-items: center; padding: 20px 0; }
+        .main-sidebar { width: 90px; height: 100%; background: var(--rtc-black); display: flex; flex-direction: column; align-items: center; padding: 20px 0; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; -ms-overflow-style: none; }
+        .main-sidebar::-webkit-scrollbar { display: none; }
         
         .brand h2 { color: var(--clean-white); font-size: 1.4rem; font-weight: 800; text-align: center; }
         .brand span { color: #0087FF; font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; display: block; text-align: center; }
@@ -362,7 +406,7 @@ function AdminDashboard() {
         .nav-btn span { font-size: 0.7rem; font-weight: 600; }
         .nav-btn:hover, .nav-btn.active { color: var(--clean-white); background: rgba(255, 255, 255, 0.05); border-left: 4px solid #0087FF; }
         
-        .slide-panels { flex: 1; padding: 30px 20px; background: var(--clean-white); overflow-y: auto; }
+        .slide-panels { flex: 1; padding: 30px 20px; background: var(--clean-white); overflow-y: auto; min-height: 0; }
         .panel-content { display: none; }
         .panel-content.active { display: block; animation: fadeIn 0.4s ease; }
         .panel-content h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 5px; }
@@ -400,7 +444,7 @@ function AdminDashboard() {
         @media (max-width: 768px) {
             .app-wrapper { flex-direction: column-reverse; }
             .sidebar-container { width: 100%; height: 50vh; flex-direction: column; }
-            .main-sidebar { width: 100%; height: auto; flex-direction: row; padding: 10px; justify-content: space-around; }
+            .main-sidebar { width: 100%; height: auto; flex-direction: row; padding: 10px; justify-content: space-around; overflow-x: auto; overflow-y: hidden; }
             .nav-menu { flex-direction: row; margin-top: 0; justify-content: space-around; gap: 5px; }
             .nav-btn { padding: 10px; }
             .nav-btn i { font-size: 18px; }
@@ -417,6 +461,9 @@ function AdminDashboard() {
           <nav className="nav-menu">
             <button className={`nav-btn ${activePanel === 'fleet' ? 'active' : ''}`} onClick={() => setActivePanel('fleet')}>
               <i className="fa-solid fa-server"></i><span>Fleet</span>
+            </button>
+            <button className={`nav-btn ${activePanel === 'suggestions' ? 'active' : ''}`} onClick={() => setActivePanel('suggestions')}>
+              <i className="fa-solid fa-lightbulb"></i><span>Suggestions</span>
             </button>
             <button className={`nav-btn ${activePanel === 'settings' ? 'active' : ''}`} onClick={() => setActivePanel('settings')}>
               <i className="fa-solid fa-cog"></i><span>Settings</span>
@@ -486,6 +533,27 @@ function AdminDashboard() {
                      </div>
                    );
                  })
+               )}
+             </div>
+          </div>
+          
+          <div className={`panel-content ${activePanel === 'suggestions' ? 'active' : ''}`}>
+             <h2>User Suggestions</h2>
+             <p className="panel-desc">Feedback and suggestions submitted by users.</p>
+             <div className="results-list" style={{ marginTop: '15px' }}>
+               {Object.keys(suggestions).length === 0 ? (
+                 <p style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No suggestions yet.</p>
+               ) : (
+                 Object.entries(suggestions)
+                   .sort(([,a], [,b]) => b.timestamp - a.timestamp)
+                   .map(([id, suggestion]) => (
+                     <div key={id} style={{ padding: '15px', background: 'var(--clean-white)', borderRadius: '8px', marginBottom: '10px', border: '1px solid var(--border-color)', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+                       <p style={{ fontSize: '0.95rem', marginBottom: '8px', fontWeight: '500', color: 'var(--text-main)' }}>"{suggestion.text}"</p>
+                       <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                         {new Date(suggestion.timestamp).toLocaleString()}
+                       </p>
+                     </div>
+                   ))
                )}
              </div>
           </div>

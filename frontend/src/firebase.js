@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, set, onValue } from "firebase/database";
+import { getDatabase, ref, set, onValue, push } from "firebase/database";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -15,4 +15,4 @@ const app = initializeApp(firebaseConfig);
 
 // These are the magic lines that were missing. They share the database with your App.
 export const database = getDatabase(app);
-export { ref, set, onValue };
+export { ref, set, onValue, push };

@@ -161,37 +161,32 @@ export default function DriverDashboard() {
         }
 
         let isLocUnmounted = false;
-        const fetchLocation = () => {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              if (isLocUnmounted) return;
-              const loc = [position.coords.latitude, position.coords.longitude];
-              setCurrentLoc(loc);
-              setGpsError("");
-              
-              set(ref(database, `buses/${busId}`), { 
-                lat: loc[0], 
-                lng: loc[1], 
-                lastUpdated: Date.now(), 
-                status: isEmergencyRef.current ? "Emergency" : "On Route",
-                routeId: routeId,
-                speed: 0.04, 
-                dir: 1,
-                alert: isEmergencyRef.current,
-                occupancy: occupancyRef.current
-              });
-            },
-            (error) => { 
-              if (isLocUnmounted) return;
-              console.error("Geolocation Error:", error); 
-              setGpsError(`Location error (${error.code}): ${error.message}`); 
-            },
-            { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 } 
-          );
-        };
-        fetchLocation();
-        mockInterval = setInterval(fetchLocation, 2000);
-        watchId = () => { isLocUnmounted = true; }; // Dummy cleanup for watchId
+        watchId = navigator.geolocation.watchPosition(
+          (position) => {
+            if (isLocUnmounted) return;
+            const loc = [position.coords.latitude, position.coords.longitude];
+            setCurrentLoc(loc);
+            setGpsError("");
+            
+            set(ref(database, `buses/${busId}`), { 
+              lat: loc[0], 
+              lng: loc[1], 
+              lastUpdated: Date.now(), 
+              status: isEmergencyRef.current ? "Emergency" : "On Route",
+              routeId: routeId,
+              speed: 0.04, 
+              dir: 1,
+              alert: isEmergencyRef.current,
+              occupancy: occupancyRef.current
+            });
+          },
+          (error) => { 
+            if (isLocUnmounted) return;
+            console.error("Geolocation Error:", error); 
+            setGpsError(`Location error (${error.code}): ${error.message}`); 
+          },
+          { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 } 
+        );
       }
     } else if (!isTracking && busId) {
         set(ref(database, `buses/${busId}`), null);
@@ -238,7 +233,8 @@ export default function DriverDashboard() {
         .app-wrapper { display: flex; width: 100vw; height: 100vh; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: var(--text-main); background: var(--off-white); overflow: hidden; }
         
         .sidebar-container { display: flex; width: 480px; height: 100%; background: var(--clean-white); border-right: 1px solid var(--border-color); z-index: 10; box-shadow: 4px 0 25px rgba(0,0,0,0.05); }
-        .main-sidebar { width: 90px; height: 100%; background: var(--rtc-black); display: flex; flex-direction: column; align-items: center; padding: 20px 0; }
+        .main-sidebar { width: 90px; height: 100%; background: var(--rtc-black); display: flex; flex-direction: column; align-items: center; padding: 20px 0; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; -ms-overflow-style: none; }
+        .main-sidebar::-webkit-scrollbar { display: none; }
         
         .brand h2 { color: var(--clean-white); font-size: 1.4rem; font-weight: 800; text-align: center; }
         .brand span { color: var(--rtc-red); font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; display: block; text-align: center; }
@@ -249,14 +245,13 @@ export default function DriverDashboard() {
         .nav-btn span { font-size: 0.7rem; font-weight: 600; }
         .nav-btn:hover, .nav-btn.active { color: var(--clean-white); background: rgba(255, 255, 255, 0.05); border-left: 4px solid var(--rtc-red); }
         
-        .slide-panels { flex: 1; padding: 30px 20px; background: var(--clean-white); overflow-y: auto; }
+        .slide-panels { flex: 1; padding: 30px 20px; background: var(--clean-white); overflow-y: auto; min-height: 0; }
         .panel-content { display: none; }
         .panel-content.active { display: block; animation: fadeIn 0.4s ease; }
         .panel-content h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 5px; }
         .panel-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px; line-height: 1.4; }
         
         .input-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 15px; }
-        .input-group label { font-size: 0.85rem; font-weight: 600; }
         .modern-select { padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--off-white); font-size: 0.95rem; outline: none; transition: border 0.2s; width: 100%; box-sizing: border-box; }
         .modern-select:focus { border-color: var(--rtc-red); }
         
@@ -275,7 +270,7 @@ export default function DriverDashboard() {
         @media (max-width: 768px) {
             .app-wrapper { flex-direction: column-reverse; }
             .sidebar-container { width: 100%; height: 50vh; flex-direction: column; }
-            .main-sidebar { width: 100%; height: auto; flex-direction: row; padding: 10px; justify-content: space-around; }
+            .main-sidebar { width: 100%; height: auto; flex-direction: row; padding: 10px; justify-content: space-around; overflow-x: auto; overflow-y: hidden; }
             .nav-menu { flex-direction: row; margin-top: 0; justify-content: space-around; gap: 5px; }
             .nav-btn { padding: 10px; }
             .nav-btn i { font-size: 18px; }
